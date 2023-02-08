@@ -60,3 +60,7 @@ jobs:
                   CODECOV_NAME: ${{ matrix.python }}-${{ matrix.os }}
               run: |
                   codecov --required --flags=unittests
+            - name: Upload coverage
+              uses: codecov/codecov-action@v3
+              with:
+                  token: ${{ secrets.CODECOV_TOKEN }}
