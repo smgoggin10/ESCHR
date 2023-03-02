@@ -105,3 +105,11 @@ skip = [
     "docs/references.md",
     "docs/notebooks/example.ipynb"
 ]
+
+[tool.ruff]
+ignore = [
+    # I am ok with blind exception calls for now, will fix later
+    "B902",
+    # I use multiple # for identifying diff types of comments to myself
+    "E266"
+]
