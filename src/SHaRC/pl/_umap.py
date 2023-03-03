@@ -1,14 +1,15 @@
 import os
 import sys
 
-import _umap_utils
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import scanpy as sc
 import umap
-from _prune_features import calc_highly_variable_genes, calc_pca
+
+from .._prune_features import calc_highly_variable_genes, calc_pca
+from . import _umap_utils
 
 mpl.use("Agg")
 
