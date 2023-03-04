@@ -63,7 +63,7 @@ See the [changelog][changelog].
 
 ## Contact
 
-For questions and help requests, you can reach out to Sarah Goggin by [email][mailto:sg4dm@virginia.edu].
+For questions and help requests, you can reach out to Sarah Goggin by [email](mailto:sg4dm@virginia.edu).
 If you found a bug, please use the [issue tracker][issue-tracker].
 
 ## Citation
