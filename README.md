@@ -9,6 +9,9 @@
 
 Stable hyperparameter-randomized consensus clustering
 
+## Overview of Algorithm:
+![alt text](https://github.com/smgoggin10/consensuscluster/blob/main/images/sccc_fig1_no_letters.png)
+
 ## Getting started
 
 Please refer to the [documentation][link-docs]. In particular, the
