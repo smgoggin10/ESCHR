@@ -756,7 +756,7 @@ class ConsensusCluster:
         `ConsensusCluster` object modified in place.
         """
         start_time = time.time()
-        bipartite, per_iter_clust_assigns = self.ensemble(data, out_dir=out_dir)
+        bipartite, per_iter_clust_assigns = self.ensemble(data)
         ## Add info to object for post process access
         self.per_iter_clust_assigns = per_iter_clust_assigns
         self.bipartite = bipartite
