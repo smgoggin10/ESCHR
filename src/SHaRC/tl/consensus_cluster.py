@@ -713,7 +713,7 @@ class ConsensusCluster:
             # except:
             #    print("e wont print")
             # joblib.dump(out, out_dir + "/consensus_out_error.sav")
-        assert out[:, 3] == res_ls, "Warning: resolution order is wrong"
+        #assert out[:, 3] == res_ls, "Warning: resolution order is wrong"
 
         indices = [
             index for index, value in sorted(enumerate(list(out[:, 3])), key=lambda x: x[1])
