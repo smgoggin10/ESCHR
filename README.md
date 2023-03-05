@@ -60,7 +60,7 @@ For full documentation, please refer to the [documentation][link-docs] for detai
 ### Most basic example run script: 
 
 ```
-import sharc
+import SHaRC
 import pandas as pd
 
 # Read in data from a csv file. 
