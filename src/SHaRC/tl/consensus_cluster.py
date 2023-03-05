@@ -512,6 +512,12 @@ class ConsensusCluster:
         Cluster assignments resulting from all resolutions tested for
         final consensus, concatenated into one DataFrame. Each column
         is a difference resolution.
+    hard_clusters : array-like
+        Final hard cluster assignments.
+    soft_membership_metrix : array-like
+        Matrix with each sample's membership in each final consensus cluster.
+    cell_conf_score : array-like
+        Confidence scores per sample.
     adata
         Annotated data matrix. Hard cluster assignments and soft cluster
         memberships are stored as annotations. See `AnnData Documentation
@@ -529,6 +535,9 @@ class ConsensusCluster:
         "per_iter_clust_assigns",
         "bipartite",
         "multiresolution_clusters",
+        "hard_clusters",
+        "soft_membership_matrix",
+        "cell_conf_score",
         "adata",
     )
 
