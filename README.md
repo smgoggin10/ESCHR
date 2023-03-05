@@ -61,6 +61,7 @@ For full documentation, please refer to the [documentation][link-docs] for detai
 
 ```
 import sharc
+import pandas as pd
 
 # Read in data from a csv file. 
 # The method expects features as columns, so add the commented out ".T" 
@@ -69,7 +70,7 @@ import sharc
 # Also ensure that data has already been preprocessed/scaled/normalized
 # as appropriate for your data type. 
 data_filepath = "/path/to/your/data.csv"
-data = pd.read_csv(h5ad_data_filepath, index_col=0)#.T
+data = pd.read_csv(data_filepath, index_col=0)#.T
 
 # Initialize a ConsensusCluster instance
 # (add any optional hyperparameter specifications, 
