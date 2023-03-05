@@ -133,7 +133,8 @@ def calc_highly_variable_genes(
         gen_indices = np.where(one_gene_per_bin[df["mean_bin"].values])[0].tolist()
         if len(gen_indices) > 0:
             # logg.debug(
-            raise Exception(
+            #raise Exception(
+            print(
                 f"Gene indices {gen_indices} fell into a single bin: their "
                 "normalized dispersion was set to 1.\n    "
                 "Decreasing `n_bins` will likely avoid this effect."
@@ -168,7 +169,8 @@ def calc_highly_variable_genes(
         disp_cut_off = dispersion_norm[n_top_genes - 1]
         gene_subset = np.nan_to_num(df["dispersions_norm"].values) >= disp_cut_off
         # logg.debug(
-        raise Exception(
+        #raise Exception(
+        print(
             f"the {n_top_genes} top genes correspond to a " f"normalized dispersion cutoff of {disp_cut_off}"
         )
     else:
@@ -264,7 +266,8 @@ def calc_pca(
     if X.shape[1] < n_comps:
         n_comps = X.shape[1] - 1
         # logg.debug(
-        raise Exception(f"reducing number of computed PCs to {n_comps} " f"as dim of data is only {X.shape[1]}")
+        #raise Exception(
+        print(f"reducing number of computed PCs to {n_comps} " f"as dim of data is only {X.shape[1]}")
 
     if zero_center is None:
         zero_center = not issparse(X)
