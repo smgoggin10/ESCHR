@@ -807,7 +807,7 @@ class ConsensusCluster:
         if feature_names is not None:
             self.adata.var_names = feature_names
         if sample_names is not None:
-            self.adata.obs = pd.Categorical(sample_names)
+            self.adata.obs = pd.DataFrame({'sample_names': sample_names})
 
         self.adata.obs["hard_clusters"] = self.hard_clusters
         self.adata.obsm["soft_membership_matrix"] = self.soft_membership_matrix
