@@ -122,10 +122,10 @@ def parmap(f, X, nprocs=1):
     [p.join() for p in proc]
     # maintain the order of X
     ordered_res = [x for i, x in sorted(res)]
-    filename = (
-        "/project/zunderlab/sarah_data/project_ConsensusClusteringMethod/github_package/v_error_ordered_res_output"
-    )
-    joblib.dump(ordered_res, filename + ".sav")
+    #filename = (
+    #    "/project/zunderlab/sarah_data/project_ConsensusClusteringMethod/github_package/v_error_ordered_res_output"
+    #)
+    #joblib.dump(ordered_res, filename + ".sav")
     for i, x in enumerate(ordered_res):
         if isinstance(x, Exception):
             warnings.warn(f"{x} encountered in parmap {i}th arg {X[i]}")
