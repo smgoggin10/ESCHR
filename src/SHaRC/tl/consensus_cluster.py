@@ -13,8 +13,8 @@ import joblib
 import leidenalg as la
 import numpy as np
 import pandas as pd
-from _leiden import run_la_clustering
-from _prune_features import calc_highly_variable_genes, calc_pca
+from ._leiden import run_la_clustering
+from ._prune_features import calc_highly_variable_genes, calc_pca
 from igraph import Graph
 from scipy.sparse import coo_matrix, csr_matrix, hstack
 from scipy.spatial.distance import pdist, squareform
