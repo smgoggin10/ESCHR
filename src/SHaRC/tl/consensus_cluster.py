@@ -106,7 +106,7 @@ def parmap(f, X, nprocs=1):
     print("2.2 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
     q_in = multiprocessing.Queue(1)
     q_out = multiprocessing.Queue()
-    proc = [multiprocessing.Process(target=_parmap_fun, args=(ehf, q_in, q_out)) for _ in range(nprocs)]
+    proc = [multiprocessing.Process(target=_parmap_fun, args=(f, q_in, q_out)) for _ in range(nprocs)]
     print("in parmap 3")
     print("2.3 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
     for p in proc:
