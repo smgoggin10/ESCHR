@@ -60,7 +60,7 @@ For full documentation, please refer to the [documentation][link-docs] for detai
 ### Most basic example run script: 
 
 ```
-import SHaRC
+import SHaRC as sh
 import pandas as pd
 
 # Read in data from a csv file. 
@@ -76,7 +76,7 @@ data = pd.read_csv(data_filepath, index_col=0)#.T
 # (add any optional hyperparameter specifications, 
 # but bear in mind the method was designed to work for 
 # diverse datasets with the default settings.
-cc_obj = sharc.tl.ConsensusCluster()
+cc_obj = sh.tl.ConsensusCluster()
 
 # Convert data to numpy array or scipy csr matrix
 data_arr = data.to_numpy()
@@ -99,10 +99,10 @@ cc_obj.make_adata(
 # must match input feature names) to plot in either/both visualizations
 # Otherwise, output will include the top marker gene for each hard cluster.
 # Plot soft membership matrix heatmap visualization
-sharc.pl.make_smm_heatmap(cc_obj, features=None, output_path="/where/to/save/figure.png")
+sh.pl.make_smm_heatmap(cc_obj, features=None, output_path="/where/to/save/figure.png")
  
 # Plot umap visualization
-sharc.pl.plot_umap(cc_obj, features=None, output_path="/where/to/save/figure.png")
+sh.pl.plot_umap(cc_obj, features=None, output_path="/where/to/save/figure.png")
 ```
   
    
