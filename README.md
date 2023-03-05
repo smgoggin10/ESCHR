@@ -76,10 +76,12 @@ data = pd.read_csv(data_filepath, index_col=0)#.T
 # (add any optional hyperparameter specifications, 
 # but bear in mind the method was designed to work for 
 # diverse datasets with the default settings.
-cc_obj = sharc.ConsensusCluster()
+cc_obj = sharc.tl.ConsensusCluster()
 
+# Convert data to numpy array or scipy csr matrix
+data_arr = data.to_numpy()
 # Now you can run the method with your prepped data:
-cc_obj.consensus_cluster(data)
+cc_obj.consensus_cluster(data_arr)
 
 # For most built-in visualizations, you should next 
 # generate an AnnData object containing all outputs.
