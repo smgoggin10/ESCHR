@@ -150,7 +150,7 @@ def plot_umap(cc_obj, features=None, hard_clusters_cmap="tab20", feat_cmap="viri
         except Exception as e:
             print(e)
             print("No umap found - running umap...")
-            run_umap(cc_obj.adata)
+            run_umap(cc_obj)
             # pd.DataFrame(adata.obsm['X_umap']).to_csv(os.path.join(("/").join(output_path.split("/")[0:-1]), "umap_layout.csv"), index=None)
     if features is None:
         try:
