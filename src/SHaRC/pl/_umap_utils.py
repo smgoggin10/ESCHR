@@ -221,10 +221,24 @@ def embedding(
 
     color, dimensions = _broadcast_args(color, dimensions)
 
-    grid = None
-    if ax is None:
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
+    if (
+        not isinstance(color, str)
+        and isinstance(color, cabc.Sequence)
+        and len(color) > 1
+    ) or len(dimensions) > 1:
+        if ax is not None:
+            raise ValueError(
+                "Cannot specify `ax` when plotting multiple panels "
+                "(each for a given value of 'color')."
+            )
+
+        # each plot needs to be its own panel
+        fig, grid = _panel_grid(hspace, wspace, ncols, len(color))
+    else:
+        grid = None
+        if ax is None:
+            fig = pl.figure()
+            ax = fig.add_subplot(111)
 
     ############
     # Plotting #
@@ -612,3 +626,29 @@ def _add_categorical_legend(
                 fontsize=legend_fontsize,
                 path_effects=legend_fontoutline,
             )
+
+def _panel_grid(hspace, wspace, ncols, num_panels):
+    from matplotlib import gridspec
+
+    n_panels_x = min(ncols, num_panels)
+    n_panels_y = np.ceil(num_panels / n_panels_x).astype(int)
+    # each panel will have the size of rcParams['figure.figsize']
+    fig = plt.figure(
+        figsize=(
+            n_panels_x * plt.rcParams['figure.figsize'][0] * (1 + wspace),
+            n_panels_y * plt.rcParams['figure.figsize'][1],
+        ),
+    )
+    left = 0.2 / n_panels_x
+    bottom = 0.13 / n_panels_y
+    gs = gridspec.GridSpec(
+        nrows=n_panels_y,
+        ncols=n_panels_x,
+        left=left,
+        right=1 - (n_panels_x - 1) * left - 0.01 / n_panels_x,
+        bottom=bottom,
+        top=1 - (n_panels_y - 1) * bottom - 0.1 / n_panels_y,
+        hspace=hspace,
+        wspace=wspace,
+    )
+    return fig, gs
