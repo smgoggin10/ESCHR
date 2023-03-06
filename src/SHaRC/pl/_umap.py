@@ -119,7 +119,7 @@ def run_umap(cc_obj, return_layout=False, n_neighbors=15, metric="euclidean", **
         cc_obj.adata.obsm["X_umap"] = res
 
 
-def plot_umap(cc_obj, features=None, cat_cmap="tab20", cont_cmap="viridis", output_path=None, **kwargs):
+def plot_umap(cc_obj, features=None, cat_palette="tab20", cont_palette="viridis", output_path=None, **kwargs):
     """
     Make UMAP plot colored by features.
 
