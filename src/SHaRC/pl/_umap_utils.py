@@ -245,11 +245,12 @@ def embedding(
         else:
             categorical = False
         if categorical:
-            cmap = dict(
-                zip(adata.obs[value_to_plot].unique(), sns.color_palette("tab20"))
-            )  # [col] , len(adata2.obs['hard_clusters'].unique())
-            lut = {k: to_hex(v) for k, v in cmap.items()}  # cmap.items()
-            color_vector = pd.Categorical(adata.obs[value_to_plot].map(lut))
+            if palette:
+                _set_colors_for_categorical_obs(adata,value_to_plot,palette)
+            else:
+                _set_default_colors_for_categorical_obs(adata,value_to_plot)
+            cmap = dict(zip(adata.obs[value_to_plot].unique(), adata.uns[value_to_plot + "_colors"]))
+            color_vector = pd.Categorical(adata.obs[value_to_plot].map(cmap))
         else:
             color_vector = color_source_vector
 
