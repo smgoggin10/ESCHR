@@ -119,7 +119,7 @@ def run_umap(cc_obj, return_layout=False, n_neighbors=15, metric="euclidean", **
         cc_obj.adata.obsm["X_umap"] = res
 
 
-def plot_umap(cc_obj, features=None, hard_clusters_cmap="tab20", feat_cmap="viridis", output_path=None):
+def plot_umap(cc_obj, features=None, cat_cmap="tab20", cont_cmap="viridis", output_path=None, **kwargs):
     """
     Make UMAP plot colored by features.
 
@@ -130,12 +130,14 @@ def plot_umap(cc_obj, features=None, hard_clusters_cmap="tab20", feat_cmap="viri
     features : list of str, default None
         Option to specify specific features to plot, if None then the method
         will calulate marker features for each cluster and plot those.
-    smm_cmap : str, default 'gray_r'
-        Color map for the soft membership matrix heatmap.
-    feat_cmap : str, default 'YlOrBr'
-        Color map for the selected features heatmap.
+    cat_cmap : str, default 'tab20'
+        Color map for categorical features.
+    cont_cmap : str, default 'viridis'
+        Color map for continuous features.
     output_path : str, default None
         Path specifying where to save the plot. If none, plot is not saved.
+    **kwargs
+        Args to pass along to matplotlib scatterplot.
     """
     # plt.rcParams['figure.figsize'] = [10, 8]
     # plt.rcParams['figure.dpi'] = 600 # 200 e.g. is really fine, but slower
@@ -175,7 +177,7 @@ def plot_umap(cc_obj, features=None, hard_clusters_cmap="tab20", feat_cmap="viri
             # sc.plt.umap(adata, color=features_to_plot, s=50, frameon=False, ncols=3, palette='tab20', save=output_path)
             # return_fig=True, show=False)
             fig = _umap_utils.embedding(
-                cc_obj.adata, color=features, s=50, frameon=False, ncols=3, palette="tab20", return_fig=True, show=False
+                cc_obj.adata, color=features, frameon=False, ncols=3, palette=cat_palette, return_fig=True, show=False, **kwargs
             )
             # with PdfPages(output_path) as pp:
             #    pp.savefig(fig)
@@ -184,5 +186,5 @@ def plot_umap(cc_obj, features=None, hard_clusters_cmap="tab20", feat_cmap="viri
         except Exception as e:
             print(e)
     else:
-        _umap_utils.embedding(cc_obj.adata, color=features, s=50, frameon=False, ncols=3, palette="tab20")
+        _umap_utils.embedding(cc_obj.adata, color=features, frameon=False, ncols=3, palette=cat_palette, **kwargs)
         # palette=cluster_color_dict, edgecolor='none', size = 15, vmax=200)
