@@ -108,6 +108,8 @@ def run_umap(cc_obj, return_layout=False, n_neighbors=15, metric="euclidean", **
     if cc_obj.adata.X.shape[1] > 6000:
         bool_features = calc_highly_variable_genes(cc_obj.adata.X)
         X = cc_obj.adata.X[:, bool_features]
+    else:
+        X = cc_obj.adata.X
     X_pca = np.array(calc_pca(X))
     ### FUNCTIONALITY FOR INITIAL POSITIONS WILL BE ADDED
     res = umap.UMAP(n_components=2, n_neighbors=n_neighbors, metric=metric, **kwargs).fit_transform(X_pca)
