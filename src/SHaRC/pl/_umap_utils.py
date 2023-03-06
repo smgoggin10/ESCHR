@@ -237,7 +237,7 @@ def embedding(
     else:
         grid = None
         if ax is None:
-            fig = pl.figure()
+            fig = plt.figure()
             ax = fig.add_subplot(111)
 
     ############
