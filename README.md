@@ -20,17 +20,18 @@ Python installed, we recommend installing [Mambaforge](https://github.com/conda-
 Temporary instructions for private repository:
 1. Make sure you have Anaconda installed and functional. [Conda FAQ](https://docs.anaconda.com/anaconda/user-guide/faq/) is a great resource for troubleshooting and verifying that everything is working properly.
 2. Download the requirements.txt file from the listed files above (are instructions for this reqd?)
-3. Create a token
+3. Open terminal or equivalent command line interface and run `conda create --name <env_name>` 
+4. Activate the environment by running `conda activate <env_name>`  
+5. Once environment is activated, run `conda install pip`
+6. If you do not have Git installed, run `conda install git`
+7. Run `pip install -r <path/to/requirements.txt>`. This will intall the necessary dependencies.
+ (optional for max performance: special install nmslib by running `pip install --no-binary :all: nmslib`)
+8. To install SHaRC from this private repository, you need to create a token:
    1. Go to this link when logged into your github account: https://github.com/settings/tokens/new
    2. Check off "repo" in the settings for your token.
    3. Click generate token and copy/save the provided code (your PAT) somewhere.
-4. Open the requirements.txt file and replace `${GITHUB_TOKEN}` in the final line with the token you just generated, save the file
-5. Open terminal or equivalent command line interface and run `conda create --name <env_name>` 
-6. Activate the environment by running `conda activate <env_name>`  
-7. Once environment is activated, run `conda install pip`
-8. If you do not have Git installed, run `conda install git`
-9. Finally, run `pip install -r <path/to/requirements.txt>`. This will intall this package and the necessary dependencies.
- (optional for max performance: special install nmslib by running `pip install --no-binary :all: nmslib`)
+9. Finally, to install SHaRC into your conda environment, run the following line replacing `${GITHUB_TOKEN}` with the token you just generated:
+`pip install git+https://${GITHUB_TOKEN}@github.com/smgoggin10/SHaRC.git`
 10. Verify that the Conda environment was created successfully by running `conda list` and verifying that expected packages are installed for this environment. Then either close the environment by running `conda deactivate` or proceed to subsequent optional setup and/or running the method within the environment.
  
 ##### Ignore below instructions, simple pip installation is not yet available.
