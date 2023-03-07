@@ -89,8 +89,6 @@ def parmap(f, X, nprocs=1):
     # simply ignore all exceptions. If exception occurs in parallel queue, the
     # process with exception will get stuck and not be able to process
     # following requests.
-    print("in parmap 1")
-    print("2.1 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
 
     def ehf(x):
         try:
@@ -102,23 +100,15 @@ def parmap(f, X, nprocs=1):
     # fall back on serial
     if nprocs == 1:
         return list(map(ehf, X))
-    print("in parmap 2")
-    print("2.2 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
     q_in = multiprocessing.Queue(1)
     q_out = multiprocessing.Queue()
     proc = [multiprocessing.Process(target=_parmap_fun, args=(f, q_in, q_out)) for _ in range(nprocs)]
-    print("in parmap 3")
-    print("2.3 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
     for p in proc:
         p.daemon = True
         p.start()
-    print("in parmap 4")
-    print("2.4 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
     sent = [q_in.put((i, x)) for i, x in enumerate(X)]
     [q_in.put((None, None)) for _ in range(nprocs)]
     res = [q_out.get() for _ in range(len(sent))]
-    print("in parmap 5")
-    print("2.5 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
     [p.join() for p in proc]
     # maintain the order of X
     ordered_res = [x for i, x in sorted(res)]
