@@ -12,6 +12,7 @@ import anndata
 import leidenalg as la
 import numpy as np
 import pandas as pd
+import zarr
 from igraph import Graph
 from scipy.sparse import coo_matrix, csr_matrix, hstack
 from scipy.spatial.distance import pdist, squareform
@@ -254,7 +255,8 @@ def run_base_clustering(args_in):
     """
     try:
         data = args_in[1]
-
+        # to handle (rare) cases where number of data points is less that the
+        # max limit on range of values for k (# neighbors)
         hyperparams = args_in[0]
         iter_k = hyperparams[0]
         la_res = hyperparams[1]
@@ -557,7 +559,7 @@ class ConsensusCluster:
             nprocs = multiprocessing.cpu_count()
         self.nprocs = min(int(nprocs), multiprocessing.cpu_count())
 
-    def ensemble(self, data):
+    def ensemble(self):
         """
         Run ensemble of clusterings.
 
@@ -580,55 +582,22 @@ class ConsensusCluster:
         """
         start_time = time.time()
 
-        if not isinstance(data, csr_matrix):
-            sparsity = 1.0 - np.count_nonzero(data) / data.size
-            print("Sparsity: " + str(sparsity))
-            if sparsity > 0.1:
-                data = csr_matrix(data)
+        data_iterator = repeat(self.zarr_loc, self.ensemble_size)
 
-        data_iterator = repeat(data, self.ensemble_size)
-        # to handle (rare) cases where number of data points is less that the
-        # max limit on range of values for k (# neighbors)
-        if data.shape[0] < self.k_range[1]:
-            self.k_range = (self.k_range[0], data.shape[0] - 1)
         print("iter_k: " + str(self.k_range))
         print("la_res: " + str(self.la_res_range))
-        hyperparam_iterator = [
-            get_hyperparameters(self.k_range, self.la_res_range, data.shape[0], self.metric)
-            for x in range(self.ensemble_size)
-        ]
+        hyperparam_iterator = [[self.k_range, self.la_res_range, self.metric] for x in range(self.ensemble_size)]
         args = list(zip(hyperparam_iterator, data_iterator))
 
         print("starting ensemble clustering multiprocess")
         out = np.array(parmap(run_base_clustering, args, nprocs=self.nprocs))
 
-        # idxs = np.where(out[:, 0] == "error")[0]
-        # if idxs.shape[0] > 0:
-        #    for idx in idxs:
-        #        if isinstance(out[idx, 1], csr_matrix):
-        #            pd.DataFrame(out[idx, 1].toarray()).to_csv(
-        #                os.path.join(out_dir, str(idx) + "error_data_out.csv"), index=None
-        #            )
-        #        else:
-        #            pd.DataFrame(out[idx, 1]).to_csv(os.path.join(out_dir, str(idx) + "error_data_out.csv"), index=None)
         try:
             clust_out = hstack(out[:, 0])
             # filename="/project/zunderlab/sarah_data/project_ConsensusClusteringMethod/github_package/v_no_error_output"
             # joblib.dump(out, out_dir + "v_no_error_output.sav")
         except Exception:
-            print("consensus_cluster.py, line 444, in fit: clust_out = hstack(out[:,0])")
-            print("Error: ")
-            # try:
-            #    print(e)
-            # except:
-            #    print("e wont print")
-            # filename="/project/zunderlab/sarah_data/project_ConsensusClusteringMethod/github_package/v_" + self.reduction + "_" + self.metric + "_" + str(self.iter_k_range) + "_" + str(self.la_res_range) + "_" + "error_output"
-            # joblib.dump(out, out_dir + "/ensemble_out_error.sav")
-            # with open(filename + ".txt", "w") as f:
-            #    f.writelines(f"{place for place in out}\n")
-            # with open(filename + '.data', 'wb') as filehandle:
-            #    # Store the data as a binary data stream
-            #    pickle.dump(out, filehandle)
+            print("consensus_cluster.py, line 599, in ensemble: clust_out = hstack(out[:,0])")
 
         per_iter_clust_assigns = csr_matrix(coo_matrix(np.concatenate(out[:, 1], axis=1)))
 
@@ -766,7 +735,9 @@ class ConsensusCluster:
         self.per_iter_clust_assigns = per_iter_clust_assigns
         self.bipartite = bipartite
 
-        hard_clusters, soft_membership_matrix = self.consensus(n=data.shape[0], bg=bipartite, out_dir=out_dir)
+        hard_clusters, soft_membership_matrix = self.consensus(
+            n=per_iter_clust_assigns.shape[0], bg=bipartite, out_dir=out_dir
+        )
 
         print("Final Clustering:")
         print("n hard clusters: " + str(len(np.unique(hard_clusters))))
