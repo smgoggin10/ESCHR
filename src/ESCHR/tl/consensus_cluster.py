@@ -254,16 +254,27 @@ def run_base_clustering(args_in):
         sampled, cluster id +1 for sampled data points.
     """
     try:
-        data = args_in[1]
+        z1 = zarr.open(args_in[1], mode="r")
+        data = coo_matrix(
+            (z1["X"]["data"][:], (z1["X"]["row"][:], z1["X"]["col"][:])),
+            shape=[np.max(z1["X"]["row"][:]) + 1, np.max(z1["X"]["col"][:]) + 1],
+        ).tocsr()
+
         # to handle (rare) cases where number of data points is less that the
         # max limit on range of values for k (# neighbors)
-        hyperparams = args_in[0]
-        iter_k = hyperparams[0]
-        la_res = hyperparams[1]
-        metric = hyperparams[2]
-        subsample_size = hyperparams[3]
-        # print('3.0 Memory usage: %s (kb)' % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
-        ## Get indices for random subsample
+        iter_k_range = args_in[0][0]
+        # set iter_k range floor based on dataset size, lower bound of 2
+        k_floor = max(min(data.shape[0] * 0.01, iter_k_range[0]), 2)
+        # set iter_k range floor based on dataset size
+        k_ceil = min(data.shape[0] * 0.2, iter_k_range[1])
+        iter_k_range = (int(k_floor), int(k_ceil))
+
+        # Get hyperparameter settings for this ensemble member
+        iter_k, la_res, metric = get_hyperparameters(iter_k_range, args_in[0][1], args_in[0][2])
+
+        # Calculate subsample size for this ensemble member
+        subsample_size = get_subsamp_ids(data.shape[0], hp=subsamp_hp)
+        # Get indices for random subsample
         subsample_ids = random.sample(range(data.shape[0]), subsample_size)
         ## Subsample data
         n_orig = data.shape[0]  # save original number of data points
@@ -272,6 +283,7 @@ def run_base_clustering(args_in):
         print(n_orig)
         print("3.1 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
         ## Log transform features if it is scRNAseq that has not yet been transformed
+        ## REMOVE FOR PUBLIC METHOD!!!
         if (
             data.shape[1] > 8000
         ):  # internal heuristic for if it scrna seq, def needs to change (just require data already be log transformed)
@@ -281,12 +293,12 @@ def run_base_clustering(args_in):
                 print("log transformed, max=" + str(np.max(data)))
 
         ### Approximate test for whether data needs to be scaled
-        if np.std(np.max(data, axis=0)) > 5:
+        if np.std(np.std(data, axis=0)) > 5:
             raise Exception(
                 "Dataset must be scaled in a manner appropriate for your data type before running through SHaRC"
             )
 
-        ## Dimensionality reduction if large number of features
+        ## Data subspace feature extraction
         data = run_pca_dim_reduction(data)
         print("3.2 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
         ## Run leiden clustering
