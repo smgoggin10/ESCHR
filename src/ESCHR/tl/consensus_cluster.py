@@ -716,7 +716,7 @@ class ConsensusCluster:
         print("time to run final consensus: " + str(time_per_iter))
         return hard_clusters, soft_membership_matrix
 
-    def consensus_cluster(self, data, out_dir=None):
+    def consensus_cluster(self, out_dir=None):
         """
         Run ensemble of clusterings and find consensus.
 
@@ -730,7 +730,7 @@ class ConsensusCluster:
         `ConsensusCluster` object modified in place.
         """
         start_time = time.time()
-        bipartite, per_iter_clust_assigns = self.ensemble(data)
+        bipartite, per_iter_clust_assigns = self.ensemble()
         ## Add info to object for post process access
         self.per_iter_clust_assigns = per_iter_clust_assigns
         self.bipartite = bipartite
