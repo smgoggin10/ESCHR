@@ -257,7 +257,8 @@ def embedding(
                 _set_colors_for_categorical_obs(adata, value_to_plot, palette)
             else:
                 _set_default_colors_for_categorical_obs(adata, value_to_plot)
-            cmap = dict(zip(adata.obs[value_to_plot].unique(), adata.uns[value_to_plot + "_colors"]))
+            values = pd.Categorical(adata.obs[value_to_plot])
+            cmap = dict(zip(values.categories, adata.uns[value_to_plot + "_colors"]))
             color_vector = pd.Categorical(adata.obs[value_to_plot].map(cmap))
         else:
             color_vector = color_source_vector
