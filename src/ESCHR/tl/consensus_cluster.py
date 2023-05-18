@@ -461,6 +461,9 @@ class ConsensusCluster:
 
     Parameters
     ----------
+    zarr_loc : str
+        Path to zarr store containing preprocessed data generated from .csv or
+        .h5ad file using `make_zarr` function.
     reduction : {'all', ‘pca’}
         Which method to use for featureextraction/selection/dimensionality
         reduction, or `all` for use all features. Currently only PCA is
@@ -515,6 +518,7 @@ class ConsensusCluster:
     """
 
     __slots__ = (
+        "zarr_loc",
         "reduction",
         "metric",
         "ensemble_size",
@@ -533,14 +537,16 @@ class ConsensusCluster:
 
     def __init__(
         self,
+        zarr_loc,
         reduction="pca",
         metric=None,  # how to add options?
         ensemble_size=150,
         auto_stop=False,
-        k_range=(25, 175),
-        la_res_range=(70, 170),
+        k_range=(15, 150),
+        la_res_range=(25, 175),
         nprocs=None,
     ):
+        self.zarr_loc = zarr_loc
         self.reduction = reduction
         self.metric = metric
         self.ensemble_size = ensemble_size
@@ -792,7 +798,16 @@ class ConsensusCluster:
         -------
         `ConsensusCluster` object modified in place or `anndata.AnnData`.
         """
-        self.adata = anndata.AnnData(X=data)
+
+        # Load zarr
+        z1 = zarr.open(self.zarr_loc, mode="r")
+
+        self.adata = anndata.AnnData(
+            X=coo_matrix(
+                (z1["X"]["data"][:], (z1["X"]["row"][:], z1["X"]["col"][:])),
+                shape=[np.max(z1["X"]["row"][:]) + 1, np.max(z1["X"]["col"][:]) + 1],
+            ).tocsr()
+        )
 
         if feature_names is not None:
             self.adata.var_names = feature_names
