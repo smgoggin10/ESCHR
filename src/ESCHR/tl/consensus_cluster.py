@@ -161,7 +161,7 @@ def get_subsamp_size(n):  # n==data.shape[0]
 
 
 ## Get hyperparameters
-def get_hyperparameters(k_range, la_res_range, n, metric=None):
+def get_hyperparameters(k_range, la_res_range, metric=None):
     """
     Calculate hyperparameters for a single clustering.
 
@@ -197,8 +197,7 @@ def get_hyperparameters(k_range, la_res_range, n, metric=None):
     la_res = random.sample(range(la_res_range[0], la_res_range[1]), 1)[0]
     if metric is None:
         metric = ["euclidean", "cosine"][random.sample(range(2), 1)[0]]
-    subsample_size = get_subsamp_size(n)
-    return k, la_res, metric, subsample_size
+    return k, la_res, metric
 
 
 def run_pca_dim_reduction(X):
@@ -273,7 +272,7 @@ def run_base_clustering(args_in):
         iter_k, la_res, metric = get_hyperparameters(iter_k_range, args_in[0][1], args_in[0][2])
 
         # Calculate subsample size for this ensemble member
-        subsample_size = get_subsamp_ids(data.shape[0], hp=subsamp_hp)
+        subsample_size = get_subsamp_size(data.shape[0])
         # Get indices for random subsample
         subsample_ids = random.sample(range(data.shape[0]), subsample_size)
         ## Subsample data
