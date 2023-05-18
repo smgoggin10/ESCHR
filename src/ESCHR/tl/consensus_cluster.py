@@ -221,7 +221,7 @@ def run_pca_dim_reduction(X):
         to cells and columns to PCA-extracted features.
     """
     time.time()
-    if X.shape[1] > 6000:
+    if X.shape[1] > 6000:  # somewhat arbitrary cutoff, come up with better heuristic?
         bool_features = calc_highly_variable_genes(X)
         X = X[:, bool_features]
     X_pca = np.array(calc_pca(X))
@@ -357,22 +357,12 @@ def get_hard_soft_clusters(n, clustering, bg):
     clust_occ_arr = np.zeros((n, len(cells_clusts)), int)
     for v in range(len(cells_clusts)):
         cluster_id = cells_clusts[v]
-        cluster_memb = [
-            clusters_vertex_ids[i] for i, j in enumerate(clustering) if j == cluster_id
-        ]  # np.array(vertex_names)[]
-        node_subset, counts = np.unique(
-            [e.source for e in bg.es.select(_source_in=cluster_memb)], return_counts=True
-        )  # +self.n_cells
-        clust_occ_arr[node_subset, v] = counts  # [restricted_hg.degree(node) for node in restricted_hg.nodes]
-    # hard_clusters = np.argmax(clust_occ_arr, axis=1)
-    # ^^ is biased, use the following to randomly break ties:
+        cluster_memb = [clusters_vertex_ids[i] for i, j in enumerate(clustering) if j == cluster_id]
+        node_subset, counts = np.unique([e.source for e in bg.es.select(_source_in=cluster_memb)], return_counts=True)
+        clust_occ_arr[node_subset, v] = counts
     hard_clusters = np.array([np.random.choice(np.where(row == row.max())[0]) for row in clust_occ_arr])
-    # clust_occ_arr = clust_occ_arr[:,np.unique(hard_clusters)]
-    soft_membership_matrix = clust_occ_arr / clust_occ_arr.sum(axis=1, keepdims=True)  # [:,hard_clusters]
-    # soft_membership_matrix = soft_membership_matrix[:,np.unique(hard_clusters)]
-    # soft_membership_matrix = np.divide(soft_membership_matrix,soft_membership_matrix.sum(axis=1))
-    # hard_clusters = pd.Categorical(np.argmax(soft_membership_matrix, axis=1))
-    return hard_clusters, soft_membership_matrix  # , clust_occ_arr
+    soft_membership_matrix = clust_occ_arr / clust_occ_arr.sum(axis=1, keepdims=True)
+    return hard_clusters, soft_membership_matrix
 
 
 def consensus_cluster_leiden(in_args):
