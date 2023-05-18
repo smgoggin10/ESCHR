@@ -9,16 +9,16 @@ import warnings
 from itertools import repeat
 
 import anndata
-import joblib
 import leidenalg as la
 import numpy as np
 import pandas as pd
-from ._leiden import run_la_clustering
-from .._prune_features import calc_highly_variable_genes, calc_pca
 from igraph import Graph
 from scipy.sparse import coo_matrix, csr_matrix, hstack
 from scipy.spatial.distance import pdist, squareform
 from sklearn import metrics
+
+from .._prune_features import calc_highly_variable_genes, calc_pca
+from ._leiden import run_la_clustering
 
 ## End Import packages section=================================================
 
@@ -112,10 +112,10 @@ def parmap(f, X, nprocs=1):
     [p.join() for p in proc]
     # maintain the order of X
     ordered_res = [x for i, x in sorted(res)]
-    #filename = (
+    # filename = (
     #    "/project/zunderlab/sarah_data/project_ConsensusClusteringMethod/github_package/v_error_ordered_res_output"
-    #)
-    #joblib.dump(ordered_res, filename + ".sav")
+    # )
+    # joblib.dump(ordered_res, filename + ".sav")
     for i, x in enumerate(ordered_res):
         if isinstance(x, Exception):
             warnings.warn(f"{x} encountered in parmap {i}th arg {X[i]}")
@@ -712,7 +712,7 @@ class ConsensusCluster:
             # except:
             #    print("e wont print")
             # joblib.dump(out, out_dir + "/consensus_out_error.sav")
-        #assert out[:, 3] == res_ls, "Warning: resolution order is wrong"
+        # assert out[:, 3] == res_ls, "Warning: resolution order is wrong"
 
         indices = [
             index for index, value in sorted(enumerate(list(out[:, 3])), key=lambda x: x[1])
@@ -797,7 +797,7 @@ class ConsensusCluster:
         if feature_names is not None:
             self.adata.var_names = feature_names
         if sample_names is not None:
-            self.adata.obs = pd.DataFrame({'sample_names': sample_names})
+            self.adata.obs = pd.DataFrame({"sample_names": sample_names})
 
         self.adata.obs["hard_clusters"] = self.hard_clusters
         self.adata.obsm["soft_membership_matrix"] = self.soft_membership_matrix

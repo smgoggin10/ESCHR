@@ -177,7 +177,14 @@ def plot_umap(cc_obj, features=None, cat_palette="tab20", cont_palette="viridis"
             # sc.plt.umap(adata, color=features_to_plot, s=50, frameon=False, ncols=3, palette='tab20', save=output_path)
             # return_fig=True, show=False)
             fig = _umap_utils.embedding(
-                cc_obj.adata, color=features, frameon=False, ncols=3, palette=cat_palette, return_fig=True, show=False, **kwargs
+                cc_obj.adata,
+                color=features,
+                frameon=False,
+                ncols=3,
+                palette=cat_palette,
+                return_fig=True,
+                show=False,
+                **kwargs,
             )
             # with PdfPages(output_path) as pp:
             #    pp.savefig(fig)

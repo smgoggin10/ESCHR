@@ -1,8 +1,9 @@
 import igraph as ig
 import leidenalg as la
 import numpy as np
-from ._knn_utils import NMSlibTransformer
 from scipy.sparse import coo_matrix
+
+from ._knn_utils import NMSlibTransformer
 
 ########################################################################################################################################################
 # Clustering Utils
