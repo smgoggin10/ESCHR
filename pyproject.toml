@@ -4,7 +4,7 @@ requires = ["hatchling"]
 
 
 [project]
-name = "SHaRC"
+name = "ESCHR"
 version = "0.0.1"
 description = "Stable hyperparameter-randomized consensus clustering"
 readme = "README.md"
@@ -16,9 +16,9 @@ authors = [
 maintainers = [
     {name = "Sarah Goggin", email = "sg4dm@virginia.edu"},
 ]
-urls.Documentation = "https://SHaRC.readthedocs.io/"
-urls.Source = "https://github.com/smgoggin10/SHaRC"
-urls.Home-page = "https://github.com/smgoggin10/SHaRC"
+urls.Documentation = "https://ESCHR.readthedocs.io/"
+urls.Source = "https://github.com/smgoggin10/ESCHR"
+urls.Home-page = "https://github.com/smgoggin10/ESCHR"
 dependencies = [
     "anndata",
     # for debug logging (referenced from the issue template)
@@ -49,10 +49,10 @@ test = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ['src/SHaRC']
+packages = ['src/ESCHR']
 
 [tool.coverage.run]
-source = ["SHaRC"]
+source = ["ESCHR"]
 omit = [
     "**/test_*.py",
 ]
