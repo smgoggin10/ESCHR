@@ -571,11 +571,6 @@ class ConsensusCluster:
         """
         Run ensemble of clusterings.
 
-        Parameters
-        ----------
-        data : array-like of shape (n_samples, n_features)
-            The data.
-
         Returns
         -------
         clust_out : :class:`~scipy.sparse.csr_matrix`
@@ -622,8 +617,9 @@ class ConsensusCluster:
         ----------
         n : int
             Number of data points/instances/cells.
-        bg :  :class:`~igraph.Graph`
-            The bipartite graph generated from the ensemble of clusterings.
+        bg :  :class:`~scipy.sparse.csr_matrix`
+            The adjacency matrix to build the bipartite graph generated
+            from the ensemble of clusterings.
 
         Returns
         -------
