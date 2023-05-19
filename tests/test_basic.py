@@ -1,10 +1,10 @@
 import pytest
 
-import SHaRC
+import ESCHR
 
 
 def test_package_has_version():
-    SHaRC.__version__
+    ESCHR.__version__
 
 
 @pytest.mark.skip(reason="This decorator should be removed when test passes.")
