@@ -4,13 +4,13 @@
     "checkout": null,
     "context": {
         "cookiecutter": {
-            "project_name": "SHaRC",
-            "package_name": "SHaRC",
-            "project_description": "Stable hyperparameter-randomized consensus clustering",
+            "project_name": "ESCHR",
+            "package_name": "ESCHR",
+            "project_description": "A hyperparameter-randomized ensemble approach for robust clustering across diverse datasets",
             "author_full_name": "Sarah Goggin",
             "author_email": "sg4dm@virginia.edu",
             "github_user": "smgoggin10",
-            "project_repo": "https://github.com/smgoggin10/SHaRC",
+            "project_repo": "https://github.com/smgoggin10/ESCHR",
             "license": "MIT License",
             "_copy_without_render": [
                 ".github/workflows/**.yaml",
