@@ -6,7 +6,7 @@ requires = ["hatchling"]
 [project]
 name = "ESCHR"
 version = "0.0.1"
-description = "Stable hyperparameter-randomized consensus clustering"
+description = "A hyperparameter-randomized ensemble approach for robust clustering across diverse datasets"
 readme = "README.md"
 requires-python = ">=3.7"
 license = {file = "LICENSE"}
