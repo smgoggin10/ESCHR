@@ -1,17 +1,17 @@
-# SHaRC
+# ESCHR
 
 [![Tests][badge-tests]][link-tests]
 [![Documentation][badge-docs]][link-docs]
 
-[badge-tests]: https://img.shields.io/github/actions/workflow/status/smgoggin10/SHaRC/test.yaml?branch=main
-[link-tests]: https://github.com/smgoggin10/SHaRC/actions/workflows/test.yml
-[badge-docs]: https://img.shields.io/readthedocs/SHaRC
+[badge-tests]: https://img.shields.io/github/actions/workflow/status/smgoggin10/ESCHR/test.yaml?branch=main
+[link-tests]: https://github.com/smgoggin10/ESCHR/actions/workflows/test.yml
+[badge-docs]: https://img.shields.io/readthedocs/ESCHR
 
-Stable hyperparameter-randomized consensus clustering
+ESCHR: A hyperparameter-randomized ensemble approach for robust clustering across diverse datasets
 
 ## Overview of Algorithm:
 
-![alt text](https://github.com/smgoggin10/SHaRC/blob/main/Images/sccc_fig1_no_letters.png)
+![alt text](https://github.com/smgoggin10/ESCHR/blob/main/Images/sccc_fig1_no_letters.png)
 
 ## Installation
 
@@ -21,37 +21,30 @@ Python installed, we recommend installing [Mambaforge](https://github.com/conda-
 Temporary instructions for private repository:
 
 1. Make sure you have Anaconda installed and functional. [Conda FAQ](https://docs.anaconda.com/anaconda/user-guide/faq/) is a great resource for troubleshooting and verifying that everything is working properly.
-2. Download the requirements.txt file from the listed files above (are instructions for this reqd?)
-3. Open terminal or equivalent command line interface and run `conda create --name <env_name>`
-4. Activate the environment by running `conda activate <env_name>`
-5. Once environment is activated, run `conda install pip`
-6. If you do not have Git installed, run `conda install git`
-7. Run `pip install -r <path/to/requirements.txt>`. This will intall the necessary dependencies.
-   (optional for max performance: special install nmslib by running `pip install --no-binary :all: nmslib`)
-8. To install SHaRC from this private repository, you need to create a token:
-    1. Go to this link when logged into your github account: https://github.com/settings/tokens/new
-    2. Check off "repo" in the settings for your token.
-    3. Click generate token and copy/save the provided code (your PAT) somewhere.
-9. Finally, to install SHaRC into your conda environment, run the following line replacing `${GITHUB_TOKEN}` with the token you just generated:
-   `pip install git+https://${GITHUB_TOKEN}@github.com/smgoggin10/SHaRC.git`
-10. Verify that the Conda environment was created successfully by running `conda list` and verifying that expected packages are installed for this environment. Then either close the environment by running `conda deactivate` or proceed to subsequent optional setup and/or running the method within the environment.
+2. Open terminal or equivalent command line interface and run `conda create --name <env_name>`
+3. Activate the environment by running `conda activate <env_name>`
+4. Once environment is activated, run `conda install pip`
+5. If you do not have Git installed, run `conda install git`
+6. To install ESCHR into your conda environment, run the following line:
+   `pip install git+https://github.com/smgoggin10/ESCHR.git`
+7. Verify that the Conda environment was created successfully by running `conda list` and verifying that expected packages are installed for this environment. Then either close the environment by running `conda deactivate` or proceed to subsequent optional setup and/or running the method within the environment.
 
 ##### Ignore below instructions, simple pip installation is not yet available.
 
-There are several alternative options to install SHaRC:
+There are several alternative options to install ESCHR:
 
 <!--
-1) Install the latest release of `SHaRC` from `PyPI <https://pypi.org/project/SHaRC/>`_:
+1) Install the latest release of `ESCHR` from `PyPI <https://pypi.org/project/ESCHR/>`_:
 
 ```bash
-pip install SHaRC
+pip install ESCHR
 ```
 -->
 
 1. Install the latest development version:
 
 ```bash
-pip install git+https://github.com/smgoggin10/SHaRC.git@main
+pip install git+https://github.com/smgoggin10/ESCHR.git@main
 ```
 
 ## Getting started
@@ -63,49 +56,53 @@ For full documentation, please refer to the [documentation][link-docs] for detai
 ### Most basic example run script:
 
 ```
-import SHaRC as sh
+import ESCHR as es
 import pandas as pd
 
 # Read in data from a csv file.
-# The method expects features as columns, so add the commented out ".T"
-# if you have features as rows.
+# The method expects features as columns
+# Use commented out ".T" if you have features as rows
 # Remove "index_col = 0" if your csv does not have row indices included.
 # Also ensure that data has already been preprocessed/scaled/normalized
 # as appropriate for your data type.
 data_filepath = "/path/to/your/data.csv"
 data = pd.read_csv(data_filepath, index_col=0)#.T
 
+# Create the zarr store that will be used for interacting with your data
+zarr_loc = "/path/to/your/data.zarr"
+es.make_zarr(data=data, zarr_loc=zarr_loc)
+
 # Initialize a ConsensusCluster instance
 # (add any optional hyperparameter specifications,
 # but bear in mind the method was designed to work for
 # diverse datasets with the default settings.
-cc_obj = sh.tl.ConsensusCluster()
+cc_obj = es.tl.ConsensusCluster(zarr_loc=zarr_loc)
 
-# Convert data to numpy array or scipy csr matrix
-data_arr = data.to_numpy()
 # Now you can run the method with your prepped data:
-cc_obj.consensus_cluster(data_arr)
+cc_obj.consensus_cluster()
 
-# For most built-in visualizations, you should next
-# generate an AnnData object containing all outputs.
+# For most built-in visualizations and/or
+# for compatibility with scverse suite of tools,
+# you should next generate an AnnData object containing all outputs.
 # There is a ConsensusCluster class method for doing this!
 # This will add the AnnData object as an attribute to the
 # ConsensusCluster object.
 cc_obj.make_adata(
-    data,
     feature_names=data.columns.values,
-    sample_names=data.index.values,
-    return_adata=False
+    sample_names=data.index.values
 )
+
+# To extract anndata object for downstream applications, run the following:
+adata = cc_obj.adata
 
 # Optionally add list of features (e.g. genes, proteins, etc. --
 # must match input feature names) to plot in either/both visualizations
 # Otherwise, output will include the top marker gene for each hard cluster.
 # Plot soft membership matrix heatmap visualization
-sh.pl.make_smm_heatmap(cc_obj, features=None, output_path="/where/to/save/figure.png")
+es.pl.make_smm_heatmap(cc_obj, features=None, output_path="/where/to/save/figure.png")
 
 # Plot umap visualization
-sh.pl.plot_umap(cc_obj, features=None, output_path="/where/to/save/figure.png")
+es.pl.plot_umap(cc_obj, features=None, output_path="/where/to/save/figure.png")
 ```
 
 ### Setting up to run via command line:
@@ -113,7 +110,7 @@ sh.pl.plot_umap(cc_obj, features=None, output_path="/where/to/save/figure.png")
 ```
 conda activate <env_name>
 python3
-import sharc
+import ESCHR
 ```
 
 Now you can run code adapted from the example run scripts above or copy and paste lines of code from the tutorial jupyter notebook.
@@ -131,9 +128,9 @@ Now you can run code adapted from the example run scripts above or copy and past
 7. Upon opening the notebook, you may be prompted to select a kernel, or if not you can click on the `Kernel` menu from the top navigation bar, and then `Change kernel`. The name of the environment you created should show up as an option for the kernel - select that as the kernel for your notebook.
 8. You should now be ready to run! Just click your way through the notebook. You can change output paths for the visualizations when you get to those cells.
 
-### Setting up to run a Jupyter Notebook on Rivanna:
+### Setting up to run a Jupyter Notebook on HPC OpenOnDemand:
 
-1. Navigate to [UVA OpenOnDemand](https://rivanna-portal.hpc.virginia.edu/pun/sys/dashboard/)
+1. Navigate to [UVA OpenOnDemand](https://rivanna-portal.hpc.virginia.edu/pun/sys/dashboard/) if you are a member of the University fo Virginia, otherwise navigate to the equivalent for your institution.
 2. Enter the dropdown menu for "Interactive Apps" from the top menu bar and select "JupyterLab"
 3. Submit a job - for optimal performance, select 4+ cores and 100GB memory (many cases won't end up needing that much memory, but it is very unlikely anything would ever exceed that - highest I've seen for peak mem is pushing 50 GB)
 4. Once your job starts, click `Connect to Jupyter`
@@ -158,7 +155,7 @@ If you found a bug, please use the [issue tracker][issue-tracker].
 
 > t.b.a
 
-[issue-tracker]: https://github.com/smgoggin10/SHaRC/issues
-[changelog]: https://SHaRC.readthedocs.io/latest/changelog.html
-[link-docs]: https://SHaRC.readthedocs.io
-[link-api]: https://SHaRC.readthedocs.io/latest/api.html
+[issue-tracker]: https://github.com/smgoggin10/ESCHR/issues
+[changelog]: https://ESCHR.readthedocs.io/latest/changelog.html
+[link-docs]: https://ESCHR.readthedocs.io
+[link-api]: https://ESCHR.readthedocs.io/latest/api.html
