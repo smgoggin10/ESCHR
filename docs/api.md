@@ -1,17 +1,5 @@
 # API
 
-## Preprocessing
-
-```{eval-rst}
-.. module:: ESCHR.pp
-.. currentmodule:: ESCHR
-
-.. autosummary::
-    :toctree: generated
-
-    pp.basic_preproc
-```
-
 ## Tools
 
 ```{eval-rst}
@@ -21,7 +9,7 @@
 .. autosummary::
     :toctree: generated
 
-    tl.basic_tool
+    tl.ConsensusCluster
 ```
 
 ## Plotting
@@ -33,6 +21,7 @@
 .. autosummary::
     :toctree: generated
 
-    pl.basic_plot
-    pl.BasicClass
+    pl.make_smm_heatmap
+    pl.plot_umap
+    pl.run_umap
 ```
