@@ -398,7 +398,14 @@ def consensus_cluster_leiden(in_args):
     n = in_args[0]
     i = in_args[1]
     # print(i)
-    bg = in_args[2]  # [0]
+    # Make bipartite igraph from sparse matrix
+    bipartite = Graph(
+        np.concatenate((np.expand_dims(in_args[2].row, axis=1), np.expand_dims(in_args[2].col + n, axis=1)), axis=1)
+    ).as_undirected()
+    type_ls = [0] * n  # self.
+    type_ls.extend([1] * (bipartite.vcount() - n))  # self.
+    bipartite.vs["type"] = type_ls  # self.
+    assert bipartite.is_bipartite()
     print("6 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
     # print(objgraph.show_most_common_types())
     p_01, p_0, p_1 = la.CPMVertexPartition.Bipartite(bg, resolution_parameter_01=i)
@@ -571,9 +578,9 @@ class ConsensusCluster:
 
         Returns
         -------
-        bipartite : :class:`~igraph.Graph`
-            The bipartite graph generated from the ensemble of clusterings, where
-            data points have connections to the cluster they were assigned to in
+        clust_out : :class:`~scipy.sparse.csr_matrix`
+            Adjacency matrix generated from the ensemble of clusterings, where
+            data points have edges to clusters they were assigned to in
             each ensemble member where they were included.
         per_iter_clust_assigns : :class:`~scipy.sparse.csr_matrix`
             Each column is an iteration of the ensemble of clusterings, rows are
@@ -602,20 +609,10 @@ class ConsensusCluster:
 
         per_iter_clust_assigns = csr_matrix(coo_matrix(np.concatenate(out[:, 1], axis=1)))
 
-        bipartite = Graph(
-            np.concatenate(
-                (np.expand_dims(clust_out.row, axis=1), np.expand_dims(clust_out.col + data.shape[0], axis=1)), axis=1
-            )
-        ).as_undirected()
-        type_ls = [0] * data.shape[0]  # self.
-        type_ls.extend([1] * (bipartite.vcount() - data.shape[0]))  # self.
-        bipartite.vs["type"] = type_ls  # self.
-        assert bipartite.is_bipartite()
-
         finish_time = time.perf_counter()
         print(f"Ensemble clustering finished in {finish_time-start_time} seconds")
 
-        return bipartite, per_iter_clust_assigns
+        return clust_out, per_iter_clust_assigns
 
     def consensus(self, n, bg, out_dir=None):
         """
@@ -732,9 +729,6 @@ class ConsensusCluster:
         """
         start_time = time.time()
         bipartite, per_iter_clust_assigns = self.ensemble()
-        ## Add info to object for post process access
-        self.per_iter_clust_assigns = per_iter_clust_assigns
-        self.bipartite = bipartite
 
         hard_clusters, soft_membership_matrix = self.consensus(
             n=per_iter_clust_assigns.shape[0], bg=bipartite, out_dir=out_dir
@@ -743,6 +737,10 @@ class ConsensusCluster:
         print("Final Clustering:")
         print("n hard clusters: " + str(len(np.unique(hard_clusters))))
         print("n soft clusters: " + str(soft_membership_matrix.shape[1]))
+
+        ## Add info to object for post process access
+        self.per_iter_clust_assigns = per_iter_clust_assigns
+        self.bipartite = bipartite
         self.hard_clusters = hard_clusters
         self.soft_membership_matrix = soft_membership_matrix
         self.cell_conf_score = np.max(soft_membership_matrix, axis=1)
