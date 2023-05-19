@@ -3,8 +3,8 @@
 ## Preprocessing
 
 ```{eval-rst}
-.. module:: SHaRC.pp
-.. currentmodule:: SHaRC
+.. module:: ESCHR.pp
+.. currentmodule:: ESCHR
 
 .. autosummary::
     :toctree: generated
@@ -15,8 +15,8 @@
 ## Tools
 
 ```{eval-rst}
-.. module:: SHaRC.tl
-.. currentmodule:: SHaRC
+.. module:: ESCHR.tl
+.. currentmodule:: ESCHR
 
 .. autosummary::
     :toctree: generated
@@ -27,8 +27,8 @@
 ## Plotting
 
 ```{eval-rst}
-.. module:: SHaRC.pl
-.. currentmodule:: SHaRC
+.. module:: ESCHR.pl
+.. currentmodule:: ESCHR
 
 .. autosummary::
     :toctree: generated
