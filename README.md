@@ -18,8 +18,6 @@ ESCHR: A hyperparameter-randomized ensemble approach for robust clustering acros
 You need to have Python 3.8 or newer installed on your system. If you don't have
 Python installed, we recommend installing [Mambaforge](https://github.com/conda-forge/miniforge#mambaforge).
 
-Temporary instructions for private repository:
-
 1. Make sure you have Anaconda installed and functional. [Conda FAQ](https://docs.anaconda.com/anaconda/user-guide/faq/) is a great resource for troubleshooting and verifying that everything is working properly.
 2. Open terminal or equivalent command line interface and run `conda create --name <env_name>`
 3. Activate the environment by running `conda activate <env_name>`
@@ -29,23 +27,6 @@ Temporary instructions for private repository:
    `pip install git+https://github.com/smgoggin10/ESCHR.git`
 7. Verify that the Conda environment was created successfully by running `conda list` and verifying that expected packages are installed for this environment. Then either close the environment by running `conda deactivate` or proceed to subsequent optional setup and/or running the method within the environment.
 
-##### Ignore below instructions, simple pip installation is not yet available.
-
-There are several alternative options to install ESCHR:
-
-<!--
-1) Install the latest release of `ESCHR` from `PyPI <https://pypi.org/project/ESCHR/>`_:
-
-```bash
-pip install ESCHR
-```
--->
-
-1. Install the latest development version:
-
-```bash
-pip install git+https://github.com/smgoggin10/ESCHR.git@main
-```
 
 ## Getting started
 
