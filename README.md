@@ -32,9 +32,7 @@ Python installed, we recommend installing [Mambaforge](https://github.com/conda-
 
 ## Getting started
 
-For full documentation, please refer to the [documentation][link-docs] for details. In particular, the
-
--   [API documentation][link-api].
+For full documentation, please refer to the [documentation][link-docs] for further details.
 
 ### Most basic example run script:
 
