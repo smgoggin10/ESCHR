@@ -1,3 +1,5 @@
+# *BETA VERSION - IN DEVELOPMENT*
+
 # ESCHR
 
 [![Tests][badge-tests]][link-tests]
