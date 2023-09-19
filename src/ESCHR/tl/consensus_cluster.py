@@ -292,11 +292,10 @@ def run_base_clustering(args_in):
                 print("log transformed, max=" + str(np.max(data)))
 
         ### Approximate test for whether data needs to be scaled
-        print("subsampled shape: " + str(data.shape[0]))
-        if np.std(np.std(data, axis=0)) > 5:
-            raise Exception(
-                "Dataset must be scaled in a manner appropriate for your data type before running through SHaRC"
-            )
+        #if np.std(np.std(data, axis=0)) > 5:
+        #    raise Exception(
+        #        "Dataset must be scaled in a manner appropriate for your data type before running through SHaRC"
+        #    )
 
         ## Data subspace feature extraction
         data = run_pca_dim_reduction(data)
