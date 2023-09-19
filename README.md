@@ -1,4 +1,4 @@
-# *BETA VERSION - IN DEVELOPMENT*
+# _BETA VERSION - IN DEVELOPMENT_
 
 # ESCHR
 
@@ -28,7 +28,6 @@ Python installed, we recommend installing [Mambaforge](https://github.com/conda-
 6. To install ESCHR into your conda environment, run the following line:
    `pip install git+https://github.com/smgoggin10/ESCHR.git`
 7. Verify that the Conda environment was created successfully by running `conda list` and verifying that expected packages are installed for this environment. Then either close the environment by running `conda deactivate` or proceed to subsequent optional setup and/or running the method within the environment.
-
 
 ## Getting started
 
