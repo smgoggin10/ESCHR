@@ -28,7 +28,7 @@ dependencies = [
     "pandas",
     "zarr",
     "scanpy",
-    "scipy==1.7.3",
+    "scipy",
     "umap-learn==0.5.2",
     "matplotlib",
     # for debug logging (referenced from the issue template)
