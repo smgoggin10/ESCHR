@@ -8,3 +8,4 @@ zarr
 scanpy
 scipy==1.7.3
 umap-learn==0.5.2
+matplotlib
