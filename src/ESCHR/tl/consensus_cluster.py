@@ -329,7 +329,7 @@ def run_base_clustering(args_in):
     except Exception as ex:
         traceback.print_exception(type(ex), ex, ex.__traceback__)
         return ["error", data]
-    return [coo_matrix(c).tocsr(), np.expand_dims(per_iter_clust_assigns, axis=1)]
+    return [coo_matrix(c), np.expand_dims(per_iter_clust_assigns, axis=1)] #.tocsr()
 
 
 def get_hard_soft_clusters(n, clustering, bg):
@@ -632,35 +632,7 @@ class ConsensusCluster:
         ## Run final consensus
         start_time2 = time.time()
 
-        res_ls = [
-            0.05,
-            0.075,
-            0.1,
-            0.125,
-            0.15,
-            0.175,
-            0.2,
-            0.225,
-            0.25,
-            0.275,
-            0.3,
-            0.325,
-            0.35,
-            0.375,
-            0.4,
-            0.425,
-            0.45,
-            0.475,
-            0.5,
-            0.525,
-            0.55,
-            0.575,
-            0.6,
-            0.625,
-            0.65,
-            0.675,
-            0.7,
-        ]
+        res_ls = [x/1000 for x in range(50, 725, 25)] # 0.05 to 0.7 inclusive by 0.025
 
         print("starting consensus multiprocess")
         start_time = time.perf_counter()
