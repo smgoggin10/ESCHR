@@ -277,9 +277,9 @@ def run_base_clustering(args_in):
         subsample_ids = random.sample(range(data.shape[0]), subsample_size)
         ## Subsample data
         n_orig = data.shape[0]  # save original number of data points
-        print(n_orig)
+        print("original shape: " + str(n_orig))
         data = data[subsample_ids, :]
-        print(n_orig)
+        print("subsampled shape: " + str(data.shape[0]))
         print("3.1 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
         ## Log transform features if it is scRNAseq that has not yet been transformed
         ## REMOVE FOR PUBLIC METHOD!!!
@@ -292,6 +292,7 @@ def run_base_clustering(args_in):
                 print("log transformed, max=" + str(np.max(data)))
 
         ### Approximate test for whether data needs to be scaled
+        print("subsampled shape: " + str(data.shape[0]))
         if np.std(np.std(data, axis=0)) > 5:
             raise Exception(
                 "Dataset must be scaled in a manner appropriate for your data type before running through SHaRC"
