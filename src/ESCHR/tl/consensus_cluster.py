@@ -408,7 +408,7 @@ def consensus_cluster_leiden(in_args):
     assert bipartite.is_bipartite()
     print("6 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
     # print(objgraph.show_most_common_types())
-    p_01, p_0, p_1 = la.CPMVertexPartition.Bipartite(bg, resolution_parameter_01=i)
+    p_01, p_0, p_1 = la.CPMVertexPartition.Bipartite(bipartite, resolution_parameter_01=i)
     optimiser = la.Optimiser()
     diff = optimiser.optimise_partition_multiplex(partitions=[p_01, p_0, p_1], layer_weights=[1, -1, -1])
     print("6.1 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
@@ -417,24 +417,24 @@ def consensus_cluster_leiden(in_args):
     clustering_cells = np.array(p_01.membership)[
         [i for i, val in enumerate(bg.vs["type"]) if not val]
     ]  # just select clusters assigns for cells?
-    hard_clusters, soft_membership_matrix = get_hard_soft_clusters(n, clustering, bg)  # , clust_occ_arr
+    hard_clusters, soft_membership_matrix = get_hard_soft_clusters(n, clustering, bipartite)  # , clust_occ_arr
     # return clust_occ_arr
     print("6.3 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
 
     ## Get ids of the base clusters that are participating in hard clusters (== good, keep)
     ## This trims "outlier" clusters that arose during the ensemble clustering
-    hard_only = list(set(range(soft_membership_matrix.shape[1])).intersection(set(np.unique(hard_clusters))))
-    soft_only_cluster_memb = [i + n for i, j in enumerate(clustering) if j not in hard_only]
+    #hard_only = list(set(range(soft_membership_matrix.shape[1])).intersection(set(np.unique(hard_clusters))))
+    #soft_only_cluster_memb = [i + n for i, j in enumerate(clustering) if j not in hard_only]
     ## Create new bipartite graph with outlier base clusters removed
-    bg.delete_vertices(soft_only_cluster_memb)
+    #bg.delete_vertices(soft_only_cluster_memb)
     ## Run clustering again with remaining base clusters
-    p_01, p_0, p_1 = la.CPMVertexPartition.Bipartite(bg, resolution_parameter_01=i)
-    optimiser = la.Optimiser()
-    diff = optimiser.optimise_partition_multiplex(partitions=[p_01, p_0, p_1], layer_weights=[1, -1, -1])
-    clustering = np.array(p_01.membership)[np.where(bg.vs["type"])[0]]  # just select clusters assigns for clusters
-    hard_clusters, soft_membership_matrix = get_hard_soft_clusters(n, clustering, bg)
+    #p_01, p_0, p_1 = la.CPMVertexPartition.Bipartite(bg, resolution_parameter_01=i)
+    #optimiser = la.Optimiser()
+    #diff = optimiser.optimise_partition_multiplex(partitions=[p_01, p_0, p_1], layer_weights=[1, -1, -1])
+    #clustering = np.array(p_01.membership)[np.where(bg.vs["type"])[0]]  # just select clusters assigns for clusters
+    #hard_clusters, soft_membership_matrix = get_hard_soft_clusters(n, clustering, bg)
     # keep only clusters that are majority membership for at least one data point
-    soft_membership_matrix = soft_membership_matrix[:, np.unique(hard_clusters)]
+    #soft_membership_matrix = soft_membership_matrix[:, np.unique(hard_clusters)]
     print("6.41 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
     # convert resulting membership back to ratio*
     soft_membership_matrix = np.divide(soft_membership_matrix, soft_membership_matrix.sum(axis=1)[:, None])  # [:,None]
@@ -447,12 +447,12 @@ def consensus_cluster_leiden(in_args):
     # print("row sums: " + str(np.unique(final_smm.sum(axis=1))))
 
     ## Get ari/ami between cells clusters and cluster clusters
-    metrics.adjusted_mutual_info_score(hard_clusters, clustering_cells)
-    ari = metrics.adjusted_rand_score(hard_clusters, clustering_cells)
+    #metrics.adjusted_mutual_info_score(hard_clusters, clustering_cells)
+    #ari = metrics.adjusted_rand_score(hard_clusters, clustering_cells)
     print("7 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
     # print(objgraph.show_most_common_types())
 
-    return hard_clusters, csr_matrix(soft_membership_matrix), ari, i
+    return hard_clusters, csr_matrix(soft_membership_matrix), i #, ari
 
 
 ############################################################################### CLASS
@@ -656,14 +656,15 @@ class ConsensusCluster:
         # assert out[:, 3] == res_ls, "Warning: resolution order is wrong"
 
         indices = [
-            index for index, value in sorted(enumerate(list(out[:, 3])), key=lambda x: x[1])
+            index for index, value in sorted(enumerate(list(out[:, 2])), key=lambda x: x[1])
         ]  # in case parallel returned in wrong order
         all_clusterings = [pd.DataFrame(x, dtype=int) for x in out[indices, 0]]
         all_clusterings_df = pd.concat(all_clusterings, axis=1)
         all_clusterings_df.columns = list(range(all_clusterings_df.shape[1]))
         self.multiresolution_clusters = all_clusterings_df
         # print(objgraph.show_most_common_types())
-        # "out" contains an array of: clustering, hard_clusters, soft_membership_matrix, bg2, ari, ami, res
+        # "out" contains an array of: hard_clusters, soft_membership_matrix, res
+        #clustering, hard_clusters, soft_membership_matrix, bg2, ari, ami, res
         finish_time = time.perf_counter()
         print(f"Program finished in {finish_time-start_time} seconds")
 
