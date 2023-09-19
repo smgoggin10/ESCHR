@@ -412,10 +412,10 @@ def consensus_cluster_leiden(in_args):
     optimiser = la.Optimiser()
     diff = optimiser.optimise_partition_multiplex(partitions=[p_01, p_0, p_1], layer_weights=[1, -1, -1])
     print("6.1 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
-    clustering = np.array(p_01.membership)[np.where(bg.vs["type"])[0]]  # just select clusters assigns for clusters
+    clustering = np.array(p_01.membership)[np.where(bipartite.vs["type"])[0]]  # just select clusters assigns for clusters
     print("6.2 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
     clustering_cells = np.array(p_01.membership)[
-        [i for i, val in enumerate(bg.vs["type"]) if not val]
+        [i for i, val in enumerate(bipartite.vs["type"]) if not val]
     ]  # just select clusters assigns for cells?
     hard_clusters, soft_membership_matrix = get_hard_soft_clusters(n, clustering, bipartite)  # , clust_occ_arr
     # return clust_occ_arr
