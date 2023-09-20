@@ -716,13 +716,13 @@ class ConsensusCluster:
         time_per_iter = time.time() - start_time
         print("Full runtime: " + str(time_per_iter))
 
-    def make_adata(self, data, feature_names=None, sample_names=None, return_adata=False):
+    def make_adata(self, data=None, feature_names=None, sample_names=None, return_adata=False):
         """
         Make annotated data object.
 
         Parameters
         ----------
-        data : array-like of shape (n_samples, n_features)
+        data : array-like of shape (n_samples, n_features), default = None
             The data.
         feature_names : array-like of shape (n_features), default = None
             Feature names of the data.
@@ -738,15 +738,33 @@ class ConsensusCluster:
         `ConsensusCluster` object modified in place or `anndata.AnnData`.
         """
 
-        # Load zarr
-        z1 = zarr.open(self.zarr_loc, mode="r")
-
-        self.adata = anndata.AnnData(
-            X=coo_matrix(
-                (z1["X"]["data"][:], (z1["X"]["row"][:], z1["X"]["col"][:])),
-                shape=[np.max(z1["X"]["row"][:]) + 1, np.max(z1["X"]["col"][:]) + 1],
-            ).tocsr()
-        )
+        if isinstance(data,anndata.AnnData):
+            self.adata = data
+            self.adata.obs["hard_clusters"] = self.hard_clusters
+            self.adata.obsm["soft_membership_matrix"] = self.soft_membership_matrix
+            self.adata.obs["cell_conf_score"] = self.cell_conf_score
+        elif isinstance(data,pd.DataFrame):
+            self.adata = anndata.AnnData(
+                X=data.to_sparse().to_coo().tocsr()
+            )
+        elif isinstance(data,np.ndarray) or isinstance(data,coo_matrix):
+            self.adata = anndata.AnnData(
+                X=csr_matrix(data)
+            )
+        elif isinstance(data,csr_matrix):
+            self.adata = anndata.AnnData(
+                X=data
+            )
+        elif data is None:
+            # Load zarr
+            z1 = zarr.open(self.zarr_loc, mode="r")
+    
+            self.adata = anndata.AnnData(
+                X=coo_matrix(
+                    (z1["X"]["data"][:], (z1["X"]["row"][:], z1["X"]["col"][:])),
+                    shape=[np.max(z1["X"]["row"][:]) + 1, np.max(z1["X"]["col"][:]) + 1],
+                ).tocsr()
+            )
 
         if feature_names is not None:
             self.adata.var_names = feature_names
