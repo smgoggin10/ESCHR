@@ -267,7 +267,7 @@ def run_base_clustering(args_in):
         # set iter_k range ceiling based on dataset size
         #k_ceil = min(data.shape[0] * 0.2, iter_k_range[1])
         #k_ceil = min(data.shape[0] * 0.2, np.log10(data.shape[0])*25) 
-        k_ceil = min(np.log10(0.01*i) * 50, iter_k_range[1])
+        k_ceil = min(np.log10(0.01*data.shape[0]) * 50, iter_k_range[1])
         iter_k_range = (int(k_floor), int(k_ceil))
 
         # Get hyperparameter settings for this ensemble member
