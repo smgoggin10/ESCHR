@@ -139,11 +139,14 @@ def make_smm_heatmap(cc_obj, features=None, smm_cmap="gray_r", feat_cmap="YlOrBr
     if output_path is not None:
         try:
             plt.savefig(output_path, bbox_inches="tight", pad_inches=0.05, dpi=600)
-            plt.close(fig)
+            if show:
+                plt.show()
+            else:
+                plt.close(annotations_heatmap)
         except Exception as e:
             print(e)
             print("You must provide an directory path to output_dir if save_plot is True")
-    if show:
+    else:
         plt.show()
 
 
