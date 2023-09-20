@@ -728,7 +728,7 @@ class ConsensusCluster:
             Feature names of the data.
         sample_names : array-like of shape (n_samples), default = None
             Sample names of the data.
-        return_adata : bool, default `True`
+        return_adata : bool, default `False`
             Whether to return the adata object (if `True`) or only add as an
             attribute to the ConsensusCluster object (if `False`,
             which is default).
@@ -775,5 +775,5 @@ class ConsensusCluster:
         self.adata.obsm["soft_membership_matrix"] = self.soft_membership_matrix
         self.adata.obs["cell_conf_score"] = self.cell_conf_score
 
-        if not return_adata:
+        if return_adata:
             return self.adata
