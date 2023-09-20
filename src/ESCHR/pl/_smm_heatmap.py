@@ -42,7 +42,7 @@ def min_max_scaler(data_1d_vec, min_val=0, max_val=1):
     return scaled_data_1d_vec
 
 
-def make_smm_heatmap(cc_obj, features=None, smm_cmap="gray_r", feat_cmap="YlOrBr", output_path=None):
+def make_smm_heatmap(cc_obj, features=None, smm_cmap="gray_r", feat_cmap="YlOrBr", show=True, output_path=None):
     """
     Scale 1D vector between a min and max value.
 
@@ -57,6 +57,8 @@ def make_smm_heatmap(cc_obj, features=None, smm_cmap="gray_r", feat_cmap="YlOrBr
         Color map for the soft membership matrix heatmap.
     feat_cmap : str, default 'YlOrBr'
         Color map for the selected features heatmap.
+    show : bool, default True
+        Whether ot show the plot.
     output_path : str, default None
         Path specifying where to save the plot. If none, plot is not saved.
 
@@ -141,6 +143,8 @@ def make_smm_heatmap(cc_obj, features=None, smm_cmap="gray_r", feat_cmap="YlOrBr
         except Exception as e:
             print(e)
             print("You must provide an directory path to output_dir if save_plot is True")
+    if show:
+        plt.show()
 
 
 def slanted_orders(
