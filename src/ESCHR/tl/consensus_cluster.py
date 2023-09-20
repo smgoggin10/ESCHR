@@ -148,10 +148,10 @@ def get_subsamp_size(n):  # n==data.shape[0]
     if oom > 1000:  # aka more than 1 mil data points
         mu = 30
     elif oom == 1:  # aka fewer than 1000 data points
-        mu = 60
+        mu = 90
     else:
         oom = 1000 - oom  # so that it scales in the appropriate direction
-        mu = ((oom - 1) / (1000 - 1)) * (60 - 30) + 30
+        mu = ((oom - 1) / (1000 - 1)) * (90 - 30) + 30
     subsample_ratio = random.gauss(mu=mu, sigma=10)
     while subsample_ratio >= 100 or subsample_ratio < 10:
         subsample_ratio = random.gauss(mu=mu, sigma=10)
