@@ -194,7 +194,8 @@ def plot_umap(cc_obj, features=None, cat_palette="tab20", cont_palette="viridis"
             if show:
                 plt.show()
             else:
-                plt.close(fig)
+                for fig_x in fig:
+                    plt.close(fig_x)
         except Exception as e:
             print(e)
     else:
