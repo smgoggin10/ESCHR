@@ -148,10 +148,10 @@ def get_subsamp_size(n):  # n==data.shape[0]
     if oom > 1000:  # aka more than 1 mil data points
         mu = 30
     elif oom == 1:  # aka fewer than 1000 data points
-        mu = 90
+        mu = 60
     else:
         oom = 1000 - oom  # so that it scales in the appropriate direction
-        mu = ((oom - 1) / (1000 - 1)) * (90 - 30) + 30
+        mu = ((oom - 1) / (1000 - 1)) * (60 - 30) + 30
     subsample_ratio = random.gauss(mu=mu, sigma=10)
     while subsample_ratio >= 100 or subsample_ratio < 10:
         subsample_ratio = random.gauss(mu=mu, sigma=10)
@@ -445,7 +445,9 @@ def consensus_cluster_leiden(in_args):
     )
     print("6.43 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
     # print("row sums: " + str(np.unique(final_smm.sum(axis=1))))
-
+    print("resolution: " + str(i) + "\n" +
+          "# soft clusters: " + str(soft_membership_matrix.shape[1]) + "\n" +
+          "# hard clusters: " + str(hard_clusters.unique().shape[0]))
     ## Get ari/ami between cells clusters and cluster clusters
     #metrics.adjusted_mutual_info_score(hard_clusters, clustering_cells)
     #ari = metrics.adjusted_rand_score(hard_clusters, clustering_cells)
