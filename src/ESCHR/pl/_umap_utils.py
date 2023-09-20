@@ -212,7 +212,10 @@ def embedding(
     # Layout #
     ##########
     # Most of the code is for the case when multiple plots are required
-
+    
+    # First set figsize based on number of subplots
+    plt.rcParams["figure.figsize"] = [3*ncols, (3*(len(color)/ncol))]
+    
     if wspace is None:
         #  try to set a wspace that is not too large or too small given the
         #  current figure size
