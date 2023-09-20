@@ -119,7 +119,7 @@ def run_umap(cc_obj, return_layout=False, n_neighbors=15, metric="euclidean", **
         cc_obj.adata.obsm["X_umap"] = res
 
 
-def plot_umap(cc_obj, features=None, cat_palette="tab20", cont_palette="viridis", output_path=None, **kwargs):
+def plot_umap(cc_obj, features=None, cat_palette="tab20", cont_palette="viridis", show=True, output_path=None, **kwargs):
     """
     Make UMAP plot colored by features.
 
@@ -134,6 +134,8 @@ def plot_umap(cc_obj, features=None, cat_palette="tab20", cont_palette="viridis"
         Color map for categorical features.
     cont_cmap : str, default 'viridis'
         Color map for continuous features.
+    show : bool, default True
+        Whether to show the plot.
     output_path : str, default None
         Path specifying where to save the plot. If none, plot is not saved.
     **kwargs
@@ -189,9 +191,13 @@ def plot_umap(cc_obj, features=None, cat_palette="tab20", cont_palette="viridis"
             # with PdfPages(output_path) as pp:
             #    pp.savefig(fig)
             plt.savefig(output_path, bbox_inches="tight", pad_inches=0.05, dpi=600)
-            plt.close(fig)
+            if show:
+                plt.show()
+            else:
+                plt.close(fig)
         except Exception as e:
             print(e)
     else:
         _umap_utils.embedding(cc_obj.adata, color=features, frameon=False, ncols=3, palette=cat_palette, **kwargs)
         # palette=cluster_color_dict, edgecolor='none', size = 15, vmax=200)
+        plt.show()
