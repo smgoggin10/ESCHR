@@ -605,8 +605,12 @@ class ConsensusCluster:
         args = list(zip(hyperparam_iterator, data_iterator))
 
         print("starting ensemble clustering multiprocess")
-        return parmap(run_base_clustering, args, nprocs=self.nprocs)
-        out = np.array(parmap(run_base_clustering, args, nprocs=self.nprocs))
+        #out = np.array(parmap(run_base_clustering, args, nprocs=self.nprocs))
+        out = parmap(run_base_clustering, args, nprocs=self.nprocs)
+        clusts_by_cell = [x[0] for x in out]
+        clusts_per_iter = [x[1] for x in out]
+        out = pd.DataFrame({'x': clusts_by_cell,
+                            'y': clusts_per_iter}).to_numpy()
 
         try:
             clust_out = hstack(out[:, 0])
