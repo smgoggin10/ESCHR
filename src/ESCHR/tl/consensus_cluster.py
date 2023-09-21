@@ -656,9 +656,16 @@ class ConsensusCluster:
         bg_iterator = repeat(bg, len(res_ls))
         n_iterator = repeat(n, len(res_ls))
         args = list(zip(n_iterator, res_ls, bg_iterator))
-        out = np.array(parmap(consensus_cluster_leiden, args, nprocs=self.nprocs))
+        #out = np.array(parmap(consensus_cluster_leiden, args, nprocs=self.nprocs))
+        out = parmap(run_base_clustering, args, nprocs=self.nprocs)
+        hard_clusters = [x[0] for x in out]
+        soft_clusters = [x[1] for x in out]
+        ress = [x[2] for x in out]
+        out = pd.DataFrame({'x': hard_clusters,
+                            'y': soft_clusters,
+                           'z': ress}).to_numpy()
         try:
-            out = out[np.argsort(out[:, 3])]
+            out = out[np.argsort(out[:, 2])]
             # filename="/project/zunderlab/sarah_data/project_ConsensusClusteringMethod/github_package/v_no_error_output"
             # joblib.dump(out, out_dir + "v_no_error_output.sav")
         except Exception as e:
