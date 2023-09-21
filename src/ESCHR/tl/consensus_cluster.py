@@ -259,19 +259,7 @@ def run_base_clustering(args_in):
             shape=[np.max(z1["X"]["row"][:]) + 1, np.max(z1["X"]["col"][:]) + 1],
         ).tocsr()
 
-        # to handle (rare) cases where number of data points is less that the
-        # max limit on range of values for k (# neighbors)
-        iter_k_range = args_in[0][0]
-        # set iter_k range floor based on dataset size, lower bound of 2
-        k_floor = max(min(data.shape[0] * 0.01, iter_k_range[0]), 2)
-        # set iter_k range ceiling based on dataset size
-        #k_ceil = min(data.shape[0] * 0.2, iter_k_range[1])
-        #k_ceil = min(data.shape[0] * 0.2, np.log10(data.shape[0])*25) 
-        k_ceil = min(np.log10(0.01*data.shape[0]) * 50, iter_k_range[1])
-        iter_k_range = (int(k_floor), int(k_ceil))
-
-        # Get hyperparameter settings for this ensemble member
-        iter_k, la_res, metric = get_hyperparameters(iter_k_range, args_in[0][1], args_in[0][2])
+        
 
         # Calculate subsample size for this ensemble member
         subsample_size = get_subsamp_size(data.shape[0])
@@ -283,15 +271,35 @@ def run_base_clustering(args_in):
         data = data[subsample_ids, :]
         print("subsampled shape: " + str(data.shape[0]))
         print("3.1 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
+
+        # Get hyperparameters
+        # scale k range for selecting number of neighbors 
+        # based on size of subsampled data
+        i = data.shape[0]
+        iter_k_range = args_in[0][0]
+        # set iter_k range floor based on asymptotic function of cell number, lower bound of 2
+        #k_floor = max(min(data.shape[0] * 0.01, iter_k_range[0]), 2)
+        k_floor = max(2, (np.log10(0.01*i) * 10) - ((i*10)/(i + 500)))
+        # set iter_k range ceiling based on dataset size
+        #k_ceil = min(data.shape[0] * 0.2, iter_k_range[1])
+        #k_ceil = min(data.shape[0] * 0.2, np.log10(data.shape[0])*25) 
+        #k_ceil = min(np.log10(0.01*data.shape[0]) * 50, iter_k_range[1])
+        #min ceiling is 5, otherwise based on asymptotic function of cell number
+        k_ceil = max(5,(np.log10(0.01*i) * 50) - ((i*40)/(i + 500))) 
+        iter_k_range = (int(k_floor), int(k_ceil))
+        print("iter k range: " + str(iter_k_range))
+
+        # Get hyperparameter settings for this ensemble member
+        iter_k, la_res, metric = get_hyperparameters(iter_k_range, args_in[0][1], args_in[0][2])
         ## Log transform features if it is scRNAseq that has not yet been transformed
         ## REMOVE FOR PUBLIC METHOD!!!
-        if (
-            data.shape[1] > 8000
-        ):  # internal heuristic for if it scrna seq, def needs to change (just require data already be log transformed)
+        if data.shape[1] > 8000:  
+            # internal heuristic for if it scrna seq, def needs to change (just require data already be log transformed)
             # log2 transform, if it is not already! (can check this my looking at max value in array)
             if np.max(data) > 20:
-                data = np.log1p(data)
-                print("log transformed, max=" + str(np.max(data)))
+                #data = np.log1p(data)
+                #print("log transformed, max=" + str(np.max(data)))
+                print("Data likely needs to be preprocessed, results may be suboptimal")
 
         ### Approximate test for whether data needs to be scaled
         #if np.std(np.std(data, axis=0)) > 5:
