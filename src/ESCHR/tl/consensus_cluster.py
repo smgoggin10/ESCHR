@@ -605,6 +605,7 @@ class ConsensusCluster:
         args = list(zip(hyperparam_iterator, data_iterator))
 
         print("starting ensemble clustering multiprocess")
+        return parmap(run_base_clustering, args, nprocs=self.nprocs)
         out = np.array(parmap(run_base_clustering, args, nprocs=self.nprocs))
 
         try:
