@@ -657,7 +657,7 @@ class ConsensusCluster:
         n_iterator = repeat(n, len(res_ls))
         args = list(zip(n_iterator, res_ls, bg_iterator))
         #out = np.array(parmap(consensus_cluster_leiden, args, nprocs=self.nprocs))
-        out = parmap(run_base_clustering, args, nprocs=self.nprocs)
+        out = parmap(consensus_cluster_leiden, args, nprocs=self.nprocs)
         hard_clusters = [x[0] for x in out]
         soft_clusters = [x[1] for x in out]
         ress = [x[2] for x in out]
