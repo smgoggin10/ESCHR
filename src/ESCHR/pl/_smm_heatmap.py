@@ -8,6 +8,7 @@ import scanpy as sc
 import seaborn as sns
 from scipy.cluster import hierarchy
 from scipy.spatial.distance import pdist
+from scipy.sparse import issparse
 
 mpl.use("Agg")  # this makes plt.show not work
 
@@ -99,21 +100,21 @@ def make_smm_heatmap(cc_obj, features=None, smm_cmap="gray_r", feat_cmap="YlOrBr
     )
 
     # Prep annotation data for plotting
-    # if features == None:
-    try:
-        features = np.array(cc_obj.adata.uns["rank_genes_groups"]["names"][0].tolist())
-    except Exception as e:
-        print(e)
-        print("Calculating hard cluster top marker genes for visualization")
-        sc.tl.rank_genes_groups(cc_obj.adata, "hard_clusters", method="logreg")
-        features = np.array(cc_obj.adata.uns["rank_genes_groups"]["names"][0].tolist())
-        print("marker genes done")
+    if features == None:
+        try:
+            features = np.array(cc_obj.adata.uns["rank_genes_groups"]["names"][0].tolist())
+        except Exception as e:
+            print(e)
+            print("Calculating hard cluster top marker genes for visualization")
+            sc.tl.rank_genes_groups(cc_obj.adata, "hard_clusters", method="logreg")
+            features = np.array(cc_obj.adata.uns["rank_genes_groups"]["names"][0].tolist())
+            print("marker genes done")
+    if !isinstance(features,(list,pd.core.series.Series,np.ndarray)):
+        raise Exception('provided features must be in the form of a list, numpy array, or pandas series')
 
-    len(features)
-    try:
+    if issparse(adata.X):
         exprs_arr = cc_obj.adata.X[:, :].toarray()[row_order, :][row_col_order_dict["rows"].tolist(), :]
-    except Exception as e:
-        print(e)
+    else:
         exprs_arr = cc_obj.adata.X[:, :][row_order, :][row_col_order_dict["rows"].tolist(), :]
     print("exprs arr reordered")
     var_names = cc_obj.adata.var_names
