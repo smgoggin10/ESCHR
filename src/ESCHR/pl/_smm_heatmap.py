@@ -114,7 +114,7 @@ def make_smm_heatmap(cc_obj, features=None, smm_cmap="gray_r", feat_cmap="YlOrBr
     else:
         raise Exception('provided features must be in the form of a list, numpy array, or pandas series')
 
-    if issparse(adata.X):
+    if issparse(cc_obj.adata.X):
         exprs_arr = cc_obj.adata.X[:, :].toarray()[row_order, :][row_col_order_dict["rows"].tolist(), :]
     else:
         exprs_arr = cc_obj.adata.X[:, :][row_order, :][row_col_order_dict["rows"].tolist(), :]
