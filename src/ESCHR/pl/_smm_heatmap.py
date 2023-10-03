@@ -109,7 +109,11 @@ def make_smm_heatmap(cc_obj, features=None, smm_cmap="gray_r", feat_cmap="YlOrBr
             sc.tl.rank_genes_groups(cc_obj.adata, "hard_clusters", method="logreg")
             features = np.array(cc_obj.adata.uns["rank_genes_groups"]["names"][0].tolist())
             print("marker genes done")
-    if isinstance(features,(list,pd.core.series.Series,np.ndarray)):
+    elif isinstance(features,list):
+        features = np.array(features)
+    elif isinstance(features,pd.core.series.Series):
+        features = features.to_numpy()
+    elif isinstance(features,np.ndarray):
         features = features
     else:
         raise Exception('provided features must be in the form of a list, numpy array, or pandas series')
