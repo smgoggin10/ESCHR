@@ -279,13 +279,13 @@ def run_base_clustering(args_in):
         iter_k_range = args_in[0][0]
         # set iter_k range floor based on asymptotic function of cell number, lower bound of 2
         #k_floor = max(min(data.shape[0] * 0.01, iter_k_range[0]), 2)
-        k_floor = max(2, (np.log10(0.01*i) * 10) - ((i*10)/(i + 500)))
+        k_floor = max(2, ((30*i)/(2*(i) + 5000)))
         # set iter_k range ceiling based on dataset size
         #k_ceil = min(data.shape[0] * 0.2, iter_k_range[1])
         #k_ceil = min(data.shape[0] * 0.2, np.log10(data.shape[0])*25) 
         #k_ceil = min(np.log10(0.01*data.shape[0]) * 50, iter_k_range[1])
         #min ceiling is 5, otherwise based on asymptotic function of cell number
-        k_ceil = max(5,(np.log10(0.01*i) * 50) - ((i*40)/(i + 500))) 
+        k_ceil = max(5,(300*i)/(2*(i) + 5000)) 
         iter_k_range = (int(k_floor), int(k_ceil))
         print("iter k range: " + str(iter_k_range))
 
