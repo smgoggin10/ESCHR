@@ -206,7 +206,7 @@ def embedding(
         ):
             size = np.array(size, dtype=float)
     else:
-        size = 120000 / adata.shape[0]
+        size = 100000 / adata.shape[0]
 
     ##########
     # Layout #
