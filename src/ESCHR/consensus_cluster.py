@@ -212,7 +212,7 @@ def run_pca_dim_reduction(X):
     ----------
     X : :class:`~numpy.array` or :class:`~scipy.sparse.spmatrix`
         Data matrix of shape `n_obs` × `n_vars`. Rows correspond
-        to cells and columns to genes.
+        to cells (or other instance type) and columns to genes (or other feature type).
 
     Returns
     -------
