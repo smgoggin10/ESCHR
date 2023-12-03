@@ -93,18 +93,7 @@ def run_umap(cc_obj, return_layout=False, n_neighbors=15, metric="euclidean", **
     **X_umap** : `adata.obsm` field
         UMAP coordinates of data.
     """
-    ### Approximate test for whether data needs to be scaled
-    try:
-        if np.std(np.max(cc_obj.adata.X, axis=0)) > 5:
-            raise Exception(
-                "Dataset must be scaled in a manner appropriate for your data type before running through SHaRC"
-            )
-    except Exception as e:
-        print(e)
-        if np.std(np.max(cc_obj.adata.X, axis=0).toarray()) > 5:
-            raise Exception(
-                "Dataset must be scaled in a manner appropriate for your data type before running through SHaRC"
-            )
+    
     if cc_obj.adata.X.shape[1] > 6000:
         bool_features = calc_highly_variable_genes(cc_obj.adata.X)
         X = cc_obj.adata.X[:, bool_features]
@@ -123,7 +112,7 @@ def plot_umap(
     cc_obj, features=None, cat_palette="tab20", cont_palette="viridis", show=True, output_path=None, **kwargs
 ):
     """
-    Make UMAP plot colored by features.
+    Make UMAP plot colored by hard clusters and confidence scores.
 
     Parameters
     ----------
