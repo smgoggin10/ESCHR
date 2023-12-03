@@ -81,7 +81,6 @@ def parmap(f, X, nprocs=1):
     subsample_size : int
         The number of data points/instances/cells to sample.
     """
-    print("in parmap")
     if nprocs < 1:
         raise ValueError(f"nprocs should be >= 1. nprocs: {nprocs}")
 
@@ -265,11 +264,8 @@ def run_base_clustering(args_in):
         subsample_ids = random.sample(range(data.shape[0]), subsample_size)
         ## Subsample data
         n_orig = data.shape[0]  # save original number of data points
-        print("original shape: " + str(n_orig))
         data = data[subsample_ids, :]
-        print("subsampled shape: " + str(data.shape[0]))
-        print("3.1 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
-
+        
         # Get hyperparameters
         # scale k range for selecting number of neighbors
         # based on size of subsampled data
@@ -285,8 +281,7 @@ def run_base_clustering(args_in):
         # min ceiling is 5, otherwise based on asymptotic function of cell number
         k_ceil = max(5, (170 * i) / (1 * (i) + 3000))
         iter_k_range = (int(k_floor), int(k_ceil))
-        print("iter k range: " + str(iter_k_range))
-
+        
         # Get hyperparameter settings for this ensemble member
         iter_k, la_res, metric = get_hyperparameters(iter_k_range, args_in[0][1], args_in[0][2])
         ## Log transform features if it is scRNAseq that has not yet been transformed
@@ -307,33 +302,21 @@ def run_base_clustering(args_in):
 
         ## Data subspace feature extraction
         data = run_pca_dim_reduction(data)
-        print("3.2 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
         ## Run leiden clustering
         clusters = run_la_clustering(X=data, k=iter_k, la_res=la_res / 100, metric=metric)
-        print("Clusters type: " + str(type(clusters)))
-        print("Clusters shape: " + str(clusters.shape))
-        print(clusters[0, 0:10])
-        print("3.3 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
         ## Prepare outputs for this ensemble member
         per_iter_clust_assigns = np.zeros((n_orig), dtype=np.uint8)
-        print(per_iter_clust_assigns[0:10])
         per_iter_clust_assigns[subsample_ids] = clusters + 1
-        print(per_iter_clust_assigns[0:10])
-        # print(per_iter_clust_assigns[0:50])
 
         n_clust = len(np.unique(clusters))
-        print(n_clust)
         a = np.zeros((n_orig), dtype=np.uint8)
         a[subsample_ids] = clusters[0] + 1
-        print(a[0:10])
         b = np.ones((n_orig), dtype=np.uint8)
         c = np.zeros((n_orig, len(np.unique(a))), dtype=np.uint8)
         # print(c[0:50,0:3])
         np.put_along_axis(arr=c, indices=np.expand_dims(a, axis=1), values=np.expand_dims(b, axis=1), axis=1)  # )#,
         # print(c[0:50,0:3])
         c = np.delete(c, 0, 1)
-        # print(c[0:50,0:3])
-        print("3.4 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
     except Exception as ex:
         traceback.print_exception(type(ex), ex, ex.__traceback__)
         return ["error", data]
@@ -414,23 +397,18 @@ def consensus_cluster_leiden(in_args):
     type_ls.extend([1] * (bipartite.vcount() - n))  # self.
     bipartite.vs["type"] = type_ls  # self.
     assert bipartite.is_bipartite()
-    print("6 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
-    # print(objgraph.show_most_common_types())
     p_01, p_0, p_1 = la.CPMVertexPartition.Bipartite(bipartite, resolution_parameter_01=i)
     optimiser = la.Optimiser()
     diff = optimiser.optimise_partition_multiplex(partitions=[p_01, p_0, p_1], layer_weights=[1, -1, -1])
-    print("6.1 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
     clustering = np.array(p_01.membership)[
         np.where(bipartite.vs["type"])[0]
     ]  # just select clusters assigns for clusters
-    print("6.2 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
     clustering_cells = np.array(p_01.membership)[
         [i for i, val in enumerate(bipartite.vs["type"]) if not val]
     ]  # just select clusters assigns for cells?
     hard_clusters, soft_membership_matrix = get_hard_soft_clusters(n, clustering, bipartite)  # , clust_occ_arr
     # return clust_occ_arr
-    print("6.3 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
-
+    
     ## Get ids of the base clusters that are participating in hard clusters (== good, keep)
     ## This trims "outlier" clusters that arose during the ensemble clustering
     # hard_only = list(set(range(soft_membership_matrix.shape[1])).intersection(set(np.unique(hard_clusters))))
@@ -445,15 +423,12 @@ def consensus_cluster_leiden(in_args):
     # hard_clusters, soft_membership_matrix = get_hard_soft_clusters(n, clustering, bg)
     # keep only clusters that are majority membership for at least one data point
     # soft_membership_matrix = soft_membership_matrix[:, np.unique(hard_clusters)]
-    print("6.41 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
     # convert resulting membership back to ratio*
     soft_membership_matrix = np.divide(soft_membership_matrix, soft_membership_matrix.sum(axis=1)[:, None])  # [:,None]
-    print("6.42 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
     # calculate final hard clusters based on
     hard_clusters = pd.Categorical(
         np.array([np.random.choice(np.where(row == row.max())[0]) for row in soft_membership_matrix])
     )
-    print("6.43 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
     # print("row sums: " + str(np.unique(final_smm.sum(axis=1))))
     print(
         "resolution: "
@@ -468,8 +443,6 @@ def consensus_cluster_leiden(in_args):
     ## Get ari/ami between cells clusters and cluster clusters
     # metrics.adjusted_mutual_info_score(hard_clusters, clustering_cells)
     # ari = metrics.adjusted_rand_score(hard_clusters, clustering_cells)
-    print("7 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
-    # print(objgraph.show_most_common_types())
 
     return hard_clusters, csr_matrix(soft_membership_matrix), i  # , ari
 
@@ -606,8 +579,6 @@ class ConsensusCluster:
 
         data_iterator = repeat(self.zarr_loc, self.ensemble_size)
 
-        print("iter_k: " + str(self.k_range))
-        print("la_res: " + str(self.la_res_range))
         hyperparam_iterator = [[self.k_range, self.la_res_range, self.metric] for x in range(self.ensemble_size)]
         args = list(zip(hyperparam_iterator, data_iterator))
 
@@ -707,8 +678,8 @@ class ConsensusCluster:
         # print("Final res: " + str(res_ls[np.argmax(acc_ls)]))
         print("Final res: " + str(res_ls[opt_res_idx]))
 
-        time_per_iter = time.time() - start_time2
-        print("time to run final consensus: " + str(time_per_iter))
+        #time_per_iter = time.time() - start_time2
+        #print("time to run final consensus: " + str(time_per_iter))
         return hard_clusters, soft_membership_matrix
 
     def consensus_cluster(self, out_dir=None):
