@@ -139,16 +139,20 @@ def plot_umap(
         cc_obj.adata.obsm["X_umap"].shape[1]
     except Exception as e:
         print(e)
-        try:
-            print("No umap found - checking for existing umap layout file...")
-            cc_obj.adata.obsm["X_umap"] = np.array(
-                pd.read_csv(os.path.join(("/").join(output_path.split("/")[0:-1]), "umap_layout.csv"))
-            )
-        except Exception as e:
-            print(e)
+        if output_path is not None:
+            try:
+                print("No umap found - checking for existing umap layout file...")
+                cc_obj.adata.obsm["X_umap"] = np.array(
+                    pd.read_csv(os.path.join(("/").join(output_path.split("/")[0:-1]), "umap_layout.csv"))
+                )
+            except Exception as e:
+                print(e)
+                print("No umap found - running umap...")
+                run_umap(cc_obj)
+                pd.DataFrame(cc_obj.adata.obsm['X_umap']).to_csv(os.path.join(("/").join(output_path.split("/")[0:-1]), "umap_layout.csv"), index=None)
+        else:
             print("No umap found - running umap...")
             run_umap(cc_obj)
-            # pd.DataFrame(adata.obsm['X_umap']).to_csv(os.path.join(("/").join(output_path.split("/")[0:-1]), "umap_layout.csv"), index=None)
     # For now plot_features is not available, needs troubleshooting
     plot_features = False
     if plot_features:
