@@ -160,21 +160,26 @@ def plot_umap(
             print("No umap found - running umap...")
             run_umap(cc_obj)
             # pd.DataFrame(adata.obsm['X_umap']).to_csv(os.path.join(("/").join(output_path.split("/")[0:-1]), "umap_layout.csv"), index=None)
-    if features is None:
-        try:
-            features = ["hard_clusters", "cell_conf_score"]
-            features_to_plot = np.unique(cc_obj.adata.uns["rank_genes_groups"]["names"][0].tolist()).tolist()
-            features.extend(features_to_plot)
-        except Exception as e:
-            print(e)
-            print("Calculating hard cluster top marker genes for visualization")
-            # log2 transform, if it is not already! (can check this my looking at max value in array)
-            sc.tl.rank_genes_groups(cc_obj.adata, "hard_clusters", method="logreg")
-            features = ["hard_clusters", "cell_conf_score"]
-            features_to_plot = np.unique(cc_obj.adata.uns["rank_genes_groups"]["names"][0].tolist()).tolist()
-            features.extend(features_to_plot)
-    features_to_plot = ["hard_clusters", "cell_conf_score"]
-    features_to_plot.extend(features)
+    # For now plot_features is not available, needs troubleshooting
+    plot_features = False
+    if plot_features:
+        if features is None:
+            try:
+                features = ["hard_clusters", "cell_conf_score"]
+                features_to_plot = np.unique(cc_obj.adata.uns["rank_genes_groups"]["names"][0].tolist()).tolist()
+                features.extend(features_to_plot)
+            except Exception as e:
+                print(e)
+                print("Calculating hard cluster top marker genes for visualization")
+                # log2 transform, if it is not already! (can check this my looking at max value in array)
+                sc.tl.rank_genes_groups(cc_obj.adata, "hard_clusters", method="logreg")
+                features = ["hard_clusters", "cell_conf_score"]
+                features_to_plot = np.unique(cc_obj.adata.uns["rank_genes_groups"]["names"][0].tolist()).tolist()
+                features.extend(features_to_plot)
+        features_to_plot = ["hard_clusters", "cell_conf_score"]
+        features_to_plot.extend(features)
+    else:
+        features_to_plot = ["hard_clusters", "cell_conf_score"]
     ("Done umap, generating figures...")
     if output_path is not None:
         try:
@@ -182,7 +187,7 @@ def plot_umap(
             # return_fig=True, show=False)
             fig = _umap_utils.embedding(
                 cc_obj.adata,
-                color=features,
+                color=features_to_plot,
                 frameon=False,
                 ncols=3,
                 palette=cat_palette,
@@ -201,6 +206,6 @@ def plot_umap(
         except Exception as e:
             print(e)
     else:
-        _umap_utils.embedding(cc_obj.adata, color=features, frameon=False, ncols=3, palette=cat_palette, **kwargs)
+        _umap_utils.embedding(cc_obj.adata, color=features_to_plot, frameon=False, ncols=3, palette=cat_palette, **kwargs)
         # palette=cluster_color_dict, edgecolor='none', size = 15, vmax=200)
         plt.show()
