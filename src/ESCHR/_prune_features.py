@@ -285,11 +285,12 @@ def calc_pca(
         from sklearn.decomposition import TruncatedSVD
 
         # logg.debug(
-        #raise Exception(
-        print(    "    without zero-centering: \n" +
-            "    the explained variance does not correspond to the exact statistical defintion\n" +
-            "    the first component, e.g., might be heavily influenced by different means\n" +
-            "    the following components often resemble the exact PCA very closely"
+        # raise Exception(
+        print(
+            "    without zero-centering: \n"
+            + "    the explained variance does not correspond to the exact statistical defintion\n"
+            + "    the first component, e.g., might be heavily influenced by different means\n"
+            + "    the following components often resemble the exact PCA very closely"
         )
         pca_ = TruncatedSVD(n_components=n_comps, random_state=random_state)
     X_pca = pca_.fit_transform(X)
