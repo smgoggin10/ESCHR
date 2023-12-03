@@ -7,8 +7,8 @@ import pandas as pd
 import scanpy as sc
 import seaborn as sns
 from scipy.cluster import hierarchy
-from scipy.spatial.distance import pdist
 from scipy.sparse import issparse
+from scipy.spatial.distance import pdist
 
 mpl.use("Agg")  # this makes plt.show not work
 
@@ -86,8 +86,8 @@ def make_smm_heatmap(cc_obj, features=None, smm_cmap="gray_r", feat_cmap="YlOrBr
     smm_reordered = cc_obj.adata.obsm["soft_membership_matrix"][row_order, :][row_col_order_dict["rows"].tolist(), :]
     smm_reordered = smm_reordered[:, row_col_order_dict["cols"].tolist()]
 
-    #For now plot_features is not enabled because it needs soem troubleshooting
-    plot_features=False
+    # For now plot_features is not enabled because it needs soem troubleshooting
+    plot_features = False
     if plot_features:
         plt.rcParams["figure.figsize"] = [15, 5]
         fig, (ax1, ax2) = plt.subplots(1, 2)
@@ -116,14 +116,14 @@ def make_smm_heatmap(cc_obj, features=None, smm_cmap="gray_r", feat_cmap="YlOrBr
                 sc.tl.rank_genes_groups(cc_obj.adata, "hard_clusters", method="logreg")
                 features = np.array(cc_obj.adata.uns["rank_genes_groups"]["names"][0].tolist())
                 print("marker genes done")
-        elif isinstance(features,list):
+        elif isinstance(features, list):
             features = np.array(features)
-        elif isinstance(features,pd.core.series.Series):
+        elif isinstance(features, pd.core.series.Series):
             features = features.to_numpy()
-        elif isinstance(features,np.ndarray):
+        elif isinstance(features, np.ndarray):
             features = features
         else:
-            raise Exception('provided features must be in the form of a list, numpy array, or pandas series')
+            raise Exception("provided features must be in the form of a list, numpy array, or pandas series")
 
         if issparse(cc_obj.adata.X):
             exprs_arr = cc_obj.adata.X[:, :].toarray()[row_order, :][row_col_order_dict["rows"].tolist(), :]
@@ -148,7 +148,9 @@ def make_smm_heatmap(cc_obj, features=None, smm_cmap="gray_r", feat_cmap="YlOrBr
             ax=ax2,
         )
 
-        annotations_heatmap.set_xticklabels(annotations_heatmap.get_xticklabels(), rotation=30, horizontalalignment="right")
+        annotations_heatmap.set_xticklabels(
+            annotations_heatmap.get_xticklabels(), rotation=30, horizontalalignment="right"
+        )
 
     if output_path is not None:
         try:

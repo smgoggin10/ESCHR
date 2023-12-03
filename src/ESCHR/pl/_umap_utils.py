@@ -212,10 +212,10 @@ def embedding(
     # Layout #
     ##########
     # Most of the code is for the case when multiple plots are required
-    
+
     # First set figsize based on number of subplots
-    plt.rcParams["figure.figsize"] = [3*ncols, (3*(len(color)/ncols))]
-    
+    plt.rcParams["figure.figsize"] = [3 * ncols, (3 * (len(color) / ncols))]
+
     if wspace is None:
         #  try to set a wspace that is not too large or too small given the
         #  current figure size
@@ -279,10 +279,10 @@ def embedding(
             size = np.array(size)[order]
         color_source_vector = color_source_vector[order]
         color_vector = color_vector[order]
-        #print("dims")
-        #print(dims)
-        #print("order")
-        #print(order)
+        # print("dims")
+        # print(dims)
+        # print("order")
+        # print(order)
         coords = basis_values[:, dims][order, :]
 
         # if plotting multiple panels, get the ax from the grid spec
@@ -366,7 +366,7 @@ def embedding(
         elif colorbar_loc is not None:
             plt.colorbar(cax, ax=ax, pad=0.01, fraction=0.08, aspect=30, location=colorbar_loc)
     axs = axs if grid else ax
-    #print(show)
+    # print(show)
     if show is True:
         plt.show()
     elif show is False:

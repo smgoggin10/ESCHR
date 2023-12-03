@@ -18,8 +18,8 @@ from scipy.sparse import coo_matrix, csr_matrix, hstack
 from scipy.spatial.distance import pdist, squareform
 from sklearn import metrics
 
-from ._prune_features import calc_highly_variable_genes, calc_pca
 from ._leiden import run_la_clustering
+from ._prune_features import calc_highly_variable_genes, calc_pca
 
 ## End Import packages section=================================================
 
@@ -259,8 +259,6 @@ def run_base_clustering(args_in):
             shape=[np.max(z1["X"]["row"][:]) + 1, np.max(z1["X"]["col"][:]) + 1],
         ).tocsr()
 
-        
-
         # Calculate subsample size for this ensemble member
         subsample_size = get_subsamp_size(data.shape[0])
         # Get indices for random subsample
@@ -273,19 +271,19 @@ def run_base_clustering(args_in):
         print("3.1 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
 
         # Get hyperparameters
-        # scale k range for selecting number of neighbors 
+        # scale k range for selecting number of neighbors
         # based on size of subsampled data
         i = data.shape[0]
         iter_k_range = args_in[0][0]
         # set iter_k range floor based on asymptotic function of cell number, lower bound of 2
-        #k_floor = max(min(data.shape[0] * 0.01, iter_k_range[0]), 2)
-        k_floor = max(2, ((15*i)/(1*(i) + 3000)))
+        # k_floor = max(min(data.shape[0] * 0.01, iter_k_range[0]), 2)
+        k_floor = max(2, ((15 * i) / (1 * (i) + 3000)))
         # set iter_k range ceiling based on dataset size
-        #k_ceil = min(data.shape[0] * 0.2, iter_k_range[1])
-        #k_ceil = min(data.shape[0] * 0.2, np.log10(data.shape[0])*25) 
-        #k_ceil = min(np.log10(0.01*data.shape[0]) * 50, iter_k_range[1])
-        #min ceiling is 5, otherwise based on asymptotic function of cell number
-        k_ceil = max(5,(170*i)/(1*(i) + 3000)) 
+        # k_ceil = min(data.shape[0] * 0.2, iter_k_range[1])
+        # k_ceil = min(data.shape[0] * 0.2, np.log10(data.shape[0])*25)
+        # k_ceil = min(np.log10(0.01*data.shape[0]) * 50, iter_k_range[1])
+        # min ceiling is 5, otherwise based on asymptotic function of cell number
+        k_ceil = max(5, (170 * i) / (1 * (i) + 3000))
         iter_k_range = (int(k_floor), int(k_ceil))
         print("iter k range: " + str(iter_k_range))
 
@@ -293,16 +291,16 @@ def run_base_clustering(args_in):
         iter_k, la_res, metric = get_hyperparameters(iter_k_range, args_in[0][1], args_in[0][2])
         ## Log transform features if it is scRNAseq that has not yet been transformed
         ## REMOVE FOR PUBLIC METHOD!!!
-        if data.shape[1] > 8000:  
+        if data.shape[1] > 8000:
             # internal heuristic for if it scrna seq, def needs to change (just require data already be log transformed)
             # log2 transform, if it is not already! (can check this my looking at max value in array)
             if np.max(data) > 20:
-                #data = np.log1p(data)
-                #print("log transformed, max=" + str(np.max(data)))
+                # data = np.log1p(data)
+                # print("log transformed, max=" + str(np.max(data)))
                 print("Data likely needs to be preprocessed, results may be suboptimal")
 
         ### Approximate test for whether data needs to be scaled
-        #if np.std(np.std(data, axis=0)) > 5:
+        # if np.std(np.std(data, axis=0)) > 5:
         #    raise Exception(
         #        "Dataset must be scaled in a manner appropriate for your data type before running through SHaRC"
         #    )
@@ -339,7 +337,7 @@ def run_base_clustering(args_in):
     except Exception as ex:
         traceback.print_exception(type(ex), ex, ex.__traceback__)
         return ["error", data]
-    return [coo_matrix(c), np.expand_dims(per_iter_clust_assigns, axis=1)] #.tocsr()
+    return [coo_matrix(c), np.expand_dims(per_iter_clust_assigns, axis=1)]  # .tocsr()
 
 
 def get_hard_soft_clusters(n, clustering, bg):
@@ -422,7 +420,9 @@ def consensus_cluster_leiden(in_args):
     optimiser = la.Optimiser()
     diff = optimiser.optimise_partition_multiplex(partitions=[p_01, p_0, p_1], layer_weights=[1, -1, -1])
     print("6.1 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
-    clustering = np.array(p_01.membership)[np.where(bipartite.vs["type"])[0]]  # just select clusters assigns for clusters
+    clustering = np.array(p_01.membership)[
+        np.where(bipartite.vs["type"])[0]
+    ]  # just select clusters assigns for clusters
     print("6.2 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
     clustering_cells = np.array(p_01.membership)[
         [i for i, val in enumerate(bipartite.vs["type"]) if not val]
@@ -433,18 +433,18 @@ def consensus_cluster_leiden(in_args):
 
     ## Get ids of the base clusters that are participating in hard clusters (== good, keep)
     ## This trims "outlier" clusters that arose during the ensemble clustering
-    #hard_only = list(set(range(soft_membership_matrix.shape[1])).intersection(set(np.unique(hard_clusters))))
-    #soft_only_cluster_memb = [i + n for i, j in enumerate(clustering) if j not in hard_only]
+    # hard_only = list(set(range(soft_membership_matrix.shape[1])).intersection(set(np.unique(hard_clusters))))
+    # soft_only_cluster_memb = [i + n for i, j in enumerate(clustering) if j not in hard_only]
     ## Create new bipartite graph with outlier base clusters removed
-    #bg.delete_vertices(soft_only_cluster_memb)
+    # bg.delete_vertices(soft_only_cluster_memb)
     ## Run clustering again with remaining base clusters
-    #p_01, p_0, p_1 = la.CPMVertexPartition.Bipartite(bg, resolution_parameter_01=i)
-    #optimiser = la.Optimiser()
-    #diff = optimiser.optimise_partition_multiplex(partitions=[p_01, p_0, p_1], layer_weights=[1, -1, -1])
-    #clustering = np.array(p_01.membership)[np.where(bg.vs["type"])[0]]  # just select clusters assigns for clusters
-    #hard_clusters, soft_membership_matrix = get_hard_soft_clusters(n, clustering, bg)
+    # p_01, p_0, p_1 = la.CPMVertexPartition.Bipartite(bg, resolution_parameter_01=i)
+    # optimiser = la.Optimiser()
+    # diff = optimiser.optimise_partition_multiplex(partitions=[p_01, p_0, p_1], layer_weights=[1, -1, -1])
+    # clustering = np.array(p_01.membership)[np.where(bg.vs["type"])[0]]  # just select clusters assigns for clusters
+    # hard_clusters, soft_membership_matrix = get_hard_soft_clusters(n, clustering, bg)
     # keep only clusters that are majority membership for at least one data point
-    #soft_membership_matrix = soft_membership_matrix[:, np.unique(hard_clusters)]
+    # soft_membership_matrix = soft_membership_matrix[:, np.unique(hard_clusters)]
     print("6.41 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
     # convert resulting membership back to ratio*
     soft_membership_matrix = np.divide(soft_membership_matrix, soft_membership_matrix.sum(axis=1)[:, None])  # [:,None]
@@ -455,16 +455,23 @@ def consensus_cluster_leiden(in_args):
     )
     print("6.43 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
     # print("row sums: " + str(np.unique(final_smm.sum(axis=1))))
-    print("resolution: " + str(i) + "\n" +
-          "# soft clusters: " + str(soft_membership_matrix.shape[1]) + "\n" +
-          "# hard clusters: " + str(hard_clusters.unique().shape[0]))
+    print(
+        "resolution: "
+        + str(i)
+        + "\n"
+        + "# soft clusters: "
+        + str(soft_membership_matrix.shape[1])
+        + "\n"
+        + "# hard clusters: "
+        + str(hard_clusters.unique().shape[0])
+    )
     ## Get ari/ami between cells clusters and cluster clusters
-    #metrics.adjusted_mutual_info_score(hard_clusters, clustering_cells)
-    #ari = metrics.adjusted_rand_score(hard_clusters, clustering_cells)
+    # metrics.adjusted_mutual_info_score(hard_clusters, clustering_cells)
+    # ari = metrics.adjusted_rand_score(hard_clusters, clustering_cells)
     print("7 Memory usage: %s (kb)" % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
     # print(objgraph.show_most_common_types())
 
-    return hard_clusters, csr_matrix(soft_membership_matrix), i #, ari
+    return hard_clusters, csr_matrix(soft_membership_matrix), i  # , ari
 
 
 ############################################################################### CLASS
@@ -605,12 +612,11 @@ class ConsensusCluster:
         args = list(zip(hyperparam_iterator, data_iterator))
 
         print("starting ensemble clustering multiprocess")
-        #out = np.array(parmap(run_base_clustering, args, nprocs=self.nprocs))
+        # out = np.array(parmap(run_base_clustering, args, nprocs=self.nprocs))
         out = parmap(run_base_clustering, args, nprocs=self.nprocs)
         clusts_by_cell = [x[0] for x in out]
         clusts_per_iter = [x[1] for x in out]
-        out = pd.DataFrame({'x': clusts_by_cell,
-                            'y': clusts_per_iter}).to_numpy()
+        out = pd.DataFrame({"x": clusts_by_cell, "y": clusts_per_iter}).to_numpy()
 
         try:
             clust_out = hstack(out[:, 0])
@@ -649,21 +655,19 @@ class ConsensusCluster:
         ## Run final consensus
         start_time2 = time.time()
 
-        res_ls = [x/1000 for x in range(50, 725, 25)] # 0.05 to 0.7 inclusive by 0.025
+        res_ls = [x / 1000 for x in range(50, 725, 25)]  # 0.05 to 0.7 inclusive by 0.025
 
         print("starting consensus multiprocess")
         start_time = time.perf_counter()
         bg_iterator = repeat(bg, len(res_ls))
         n_iterator = repeat(n, len(res_ls))
         args = list(zip(n_iterator, res_ls, bg_iterator))
-        #out = np.array(parmap(consensus_cluster_leiden, args, nprocs=self.nprocs))
+        # out = np.array(parmap(consensus_cluster_leiden, args, nprocs=self.nprocs))
         out = parmap(consensus_cluster_leiden, args, nprocs=self.nprocs)
         hard_clusters = [x[0] for x in out]
         soft_clusters = [x[1] for x in out]
         ress = [x[2] for x in out]
-        out = pd.DataFrame({'x': hard_clusters,
-                            'y': soft_clusters,
-                           'z': ress}).to_numpy()
+        out = pd.DataFrame({"x": hard_clusters, "y": soft_clusters, "z": ress}).to_numpy()
         try:
             out = out[np.argsort(out[:, 2])]
             # filename="/project/zunderlab/sarah_data/project_ConsensusClusteringMethod/github_package/v_no_error_output"
@@ -688,7 +692,7 @@ class ConsensusCluster:
         self.multiresolution_clusters = all_clusterings_df
         # print(objgraph.show_most_common_types())
         # "out" contains an array of: hard_clusters, soft_membership_matrix, res
-        #clustering, hard_clusters, soft_membership_matrix, bg2, ari, ami, res
+        # clustering, hard_clusters, soft_membership_matrix, bg2, ari, ami, res
         finish_time = time.perf_counter()
         print(f"Program finished in {finish_time-start_time} seconds")
 
@@ -762,27 +766,21 @@ class ConsensusCluster:
         `ConsensusCluster` object modified in place or `anndata.AnnData`.
         """
 
-        if isinstance(data,anndata.AnnData):
+        if isinstance(data, anndata.AnnData):
             self.adata = data
             self.adata.obs["hard_clusters"] = self.hard_clusters
             self.adata.obsm["soft_membership_matrix"] = self.soft_membership_matrix
             self.adata.obs["cell_conf_score"] = self.cell_conf_score
-        elif isinstance(data,pd.DataFrame):
-            self.adata = anndata.AnnData(
-                X=data.to_sparse().to_coo().tocsr()
-            )
-        elif isinstance(data,np.ndarray) or isinstance(data,coo_matrix):
-            self.adata = anndata.AnnData(
-                X=csr_matrix(data)
-            )
-        elif isinstance(data,csr_matrix):
-            self.adata = anndata.AnnData(
-                X=data
-            )
+        elif isinstance(data, pd.DataFrame):
+            self.adata = anndata.AnnData(X=data.to_sparse().to_coo().tocsr())
+        elif isinstance(data, np.ndarray) or isinstance(data, coo_matrix):
+            self.adata = anndata.AnnData(X=csr_matrix(data))
+        elif isinstance(data, csr_matrix):
+            self.adata = anndata.AnnData(X=data)
         elif data is None:
             # Load zarr
             z1 = zarr.open(self.zarr_loc, mode="r")
-    
+
             self.adata = anndata.AnnData(
                 X=coo_matrix(
                     (z1["X"]["data"][:], (z1["X"]["row"][:], z1["X"]["col"][:])),
