@@ -18,7 +18,7 @@ from scipy.sparse import coo_matrix, csr_matrix, hstack
 from scipy.spatial.distance import pdist, squareform
 from sklearn import metrics
 
-from .._prune_features import calc_highly_variable_genes, calc_pca
+from ._prune_features import calc_highly_variable_genes, calc_pca
 from ._leiden import run_la_clustering
 
 ## End Import packages section=================================================
