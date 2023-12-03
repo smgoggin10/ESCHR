@@ -27,8 +27,8 @@ from ._prune_features import calc_highly_variable_genes, calc_pca
 # flake8: noqa: E266
 
 ## Suppress warnings from printing
-# warnings.filterwarnings("ignore")
-warnings.filterwarnings('ignore', message='*Note that scikit-learn's randomized PCA might not be exactly reproducible*')
+warnings.filterwarnings("ignore")
+#warnings.filterwarnings('ignore', message='*Note that scikit-learn's randomized PCA might not be exactly reproducible*')
 
 
 ## FUNCTION AND CLASS DOCUMENTATION!!
