@@ -86,8 +86,14 @@ def make_smm_heatmap(cc_obj, features=None, smm_cmap="gray_r", feat_cmap="YlOrBr
     smm_reordered = cc_obj.adata.obsm["soft_membership_matrix"][row_order, :][row_col_order_dict["rows"].tolist(), :]
     smm_reordered = smm_reordered[:, row_col_order_dict["cols"].tolist()]
 
-    plt.rcParams["figure.figsize"] = [25, 10]
-    fig, (ax1, ax2) = plt.subplots(1, 2)
+    #For now plot_features is not enabled because it needs soem troubleshooting
+    plot_features=False
+    if plot_features:
+        plt.rcParams["figure.figsize"] = [15, 5]
+        fig, (ax1, ax2) = plt.subplots(1, 2)
+    else:
+        plt.rcParams["figure.figsize"] = [10, 5]
+        fig, ax1 = plt.subplots()
 
     heatmap = sns.heatmap(
         pd.DataFrame(smm_reordered, columns=row_col_order_dict["cols"].tolist()),
@@ -99,49 +105,50 @@ def make_smm_heatmap(cc_obj, features=None, smm_cmap="gray_r", feat_cmap="YlOrBr
         ax=ax1,
     )
 
-    # Prep annotation data for plotting
-    if features == None:
-        try:
-            features = np.array(cc_obj.adata.uns["rank_genes_groups"]["names"][0].tolist())
-        except Exception as e:
-            print(e)
-            print("Calculating hard cluster top marker genes for visualization")
-            sc.tl.rank_genes_groups(cc_obj.adata, "hard_clusters", method="logreg")
-            features = np.array(cc_obj.adata.uns["rank_genes_groups"]["names"][0].tolist())
-            print("marker genes done")
-    elif isinstance(features,list):
-        features = np.array(features)
-    elif isinstance(features,pd.core.series.Series):
-        features = features.to_numpy()
-    elif isinstance(features,np.ndarray):
-        features = features
-    else:
-        raise Exception('provided features must be in the form of a list, numpy array, or pandas series')
+    if plot_features:
+        # Prep annotation data for plotting
+        if features == None:
+            try:
+                features = np.array(cc_obj.adata.uns["rank_genes_groups"]["names"][0].tolist())
+            except Exception as e:
+                print(e)
+                print("Calculating hard cluster top marker genes for visualization")
+                sc.tl.rank_genes_groups(cc_obj.adata, "hard_clusters", method="logreg")
+                features = np.array(cc_obj.adata.uns["rank_genes_groups"]["names"][0].tolist())
+                print("marker genes done")
+        elif isinstance(features,list):
+            features = np.array(features)
+        elif isinstance(features,pd.core.series.Series):
+            features = features.to_numpy()
+        elif isinstance(features,np.ndarray):
+            features = features
+        else:
+            raise Exception('provided features must be in the form of a list, numpy array, or pandas series')
 
-    if issparse(cc_obj.adata.X):
-        exprs_arr = cc_obj.adata.X[:, :].toarray()[row_order, :][row_col_order_dict["rows"].tolist(), :]
-    else:
-        exprs_arr = cc_obj.adata.X[:, :][row_order, :][row_col_order_dict["rows"].tolist(), :]
-    print("exprs arr reordered")
-    var_names = cc_obj.adata.var_names
-    exprs_cols_ls = [exprs_arr[:, np.nonzero(var_names.astype(str) == x)[0][0]] for x in features]
-    print("exprs_cols_ls done")
-    exprs_mat = pd.DataFrame(exprs_cols_ls).T
-    exprs_mat = exprs_mat.reindex(columns=exprs_mat.columns[row_col_order_dict["cols"].tolist()])
-    exprs_mat.columns = features[row_col_order_dict["cols"].tolist()]
-    print("reindex done")
-    exprs_mat = exprs_mat.apply(min_max_scaler, axis=1)
-    annotations_heatmap = sns.heatmap(
-        pd.DataFrame(exprs_mat),
-        cmap=feat_cmap,  # "Spectral_r" YlOrBr magma_r "viridis" #MAKE IT BE FLEXIBLE TO CATEGORICAL AND CONTINUOUS!!!!!
-        cbar=True,
-        cbar_kws=dict(use_gridspec=False, location="right"),
-        xticklabels=True,
-        yticklabels=False,
-        ax=ax2,
-    )
+        if issparse(cc_obj.adata.X):
+            exprs_arr = cc_obj.adata.X[:, :].toarray()[row_order, :][row_col_order_dict["rows"].tolist(), :]
+        else:
+            exprs_arr = cc_obj.adata.X[:, :][row_order, :][row_col_order_dict["rows"].tolist(), :]
+        print("exprs arr reordered")
+        var_names = cc_obj.adata.var_names
+        exprs_cols_ls = [exprs_arr[:, np.nonzero(var_names.astype(str) == x)[0][0]] for x in features]
+        print("exprs_cols_ls done")
+        exprs_mat = pd.DataFrame(exprs_cols_ls).T
+        exprs_mat = exprs_mat.reindex(columns=exprs_mat.columns[row_col_order_dict["cols"].tolist()])
+        exprs_mat.columns = features[row_col_order_dict["cols"].tolist()]
+        print("reindex done")
+        exprs_mat = exprs_mat.apply(min_max_scaler, axis=1)
+        annotations_heatmap = sns.heatmap(
+            pd.DataFrame(exprs_mat),
+            cmap=feat_cmap,  # "Spectral_r" YlOrBr magma_r "viridis" #MAKE IT BE FLEXIBLE TO CATEGORICAL AND CONTINUOUS!!!!!
+            cbar=True,
+            cbar_kws=dict(use_gridspec=False, location="right"),
+            xticklabels=True,
+            yticklabels=False,
+            ax=ax2,
+        )
 
-    annotations_heatmap.set_xticklabels(annotations_heatmap.get_xticklabels(), rotation=30, horizontalalignment="right")
+        annotations_heatmap.set_xticklabels(annotations_heatmap.get_xticklabels(), rotation=30, horizontalalignment="right")
 
     if output_path is not None:
         try:
