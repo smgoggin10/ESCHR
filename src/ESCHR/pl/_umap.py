@@ -174,6 +174,7 @@ def plot_umap(
     else:
         features_to_plot = ["hard_clusters", "cell_conf_score"]
     ("Done umap, generating figures...")
+    plt.rcParams['figure.figsize'] = [10, 8]
     if output_path is not None:
         try:
             # sc.plt.umap(adata, color=features_to_plot, s=50, frameon=False, ncols=3, palette='tab20', save=output_path)
@@ -182,7 +183,7 @@ def plot_umap(
                 cc_obj.adata,
                 color=features_to_plot,
                 frameon=False,
-                ncols=3,
+                ncols=2,
                 palette=cat_palette,
                 return_fig=True,
                 show=False,
@@ -199,6 +200,6 @@ def plot_umap(
         except Exception as e:
             print(e)
     else:
-        _umap_utils.embedding(cc_obj.adata, color=features_to_plot, frameon=False, ncols=3, palette=cat_palette, **kwargs)
+        _umap_utils.embedding(cc_obj.adata, color=features_to_plot, frameon=False, ncols=2, palette=cat_palette, **kwargs)
         # palette=cluster_color_dict, edgecolor='none', size = 15, vmax=200)
         plt.show()
