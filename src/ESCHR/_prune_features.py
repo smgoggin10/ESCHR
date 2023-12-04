@@ -254,15 +254,15 @@ def calc_pca(
     X_pca : :class:`scipy.sparse.spmatrix` or :class:`numpy.ndarray`
         PCA representation of data.
     """
-    if svd_solver in {"auto", "randomized"}:
-        # Add logging infrastructure post-submission
-        # logg.info(
-        #print(
-        #    "Note that scikit-learn's randomized PCA might not be exactly "
-        #    "reproducible across different computational platforms. For exact "
-        #    "reproducibility, choose `svd_solver='arpack'.` This will likely "
-        #    "become the Scanpy default in the future."
-        #)
+    #if svd_solver in {"auto", "randomized"}:
+    # Add logging infrastructure post-submission
+    # logg.info(
+    #print(
+    #    "Note that scikit-learn's randomized PCA might not be exactly "
+    #    "reproducible across different computational platforms. For exact "
+    #    "reproducibility, choose `svd_solver='arpack'.` This will likely "
+    #    "become the Scanpy default in the future."
+    #)
 
     if X.shape[1] < n_comps:
         n_comps = X.shape[1] - 1
