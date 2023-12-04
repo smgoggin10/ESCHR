@@ -5,6 +5,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 
 # flake8: noqa: B902
 
+warnings.filterwarnings("ignore")
 
 class NMSlibTransformer(TransformerMixin, BaseEstimator):
     """Wrapper for using nmslib as sklearn's KNeighborsTransformer"""
