@@ -255,13 +255,14 @@ def calc_pca(
         PCA representation of data.
     """
     if svd_solver in {"auto", "randomized"}:
+        # Add logging infrastructure post-submission
         # logg.info(
-        print(
-            "Note that scikit-learn's randomized PCA might not be exactly "
-            "reproducible across different computational platforms. For exact "
-            "reproducibility, choose `svd_solver='arpack'.` This will likely "
-            "become the Scanpy default in the future."
-        )
+        #print(
+        #    "Note that scikit-learn's randomized PCA might not be exactly "
+        #    "reproducible across different computational platforms. For exact "
+        #    "reproducibility, choose `svd_solver='arpack'.` This will likely "
+        #    "become the Scanpy default in the future."
+        #)
 
     if X.shape[1] < n_comps:
         n_comps = X.shape[1] - 1
@@ -285,15 +286,15 @@ def calc_pca(
         pca_ = PCA(n_components=n_comps, svd_solver=svd_solver, random_state=random_state)
     else:
         from sklearn.decomposition import TruncatedSVD
-
+        # Add logging infrastructure post-submission
         # logg.debug(
         # raise Exception(
-        print(
-            "    without zero-centering: \n"
-            + "    the explained variance does not correspond to the exact statistical defintion\n"
-            + "    the first component, e.g., might be heavily influenced by different means\n"
-            + "    the following components often resemble the exact PCA very closely"
-        )
+        #print(
+        #    "    without zero-centering: \n"
+        #    + "    the explained variance does not correspond to the exact statistical defintion\n"
+        #    + "    the first component, e.g., might be heavily influenced by different means\n"
+        #    + "    the following components often resemble the exact PCA very closely"
+        #)
         pca_ = TruncatedSVD(n_components=n_comps, random_state=random_state)
     X_pca = pca_.fit_transform(X)
 
