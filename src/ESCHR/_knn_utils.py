@@ -41,7 +41,6 @@ class NMSlibTransformer(TransformerMixin, BaseEstimator):
                 "l2": "l2",
                 "jaccard": "jaccard_sparse",
             }[self.metric]
-            print(space)
             if space == "jaccard_sparse":
                 # print('jaccard_sparse')
                 self.nmslib_ = nmslib.init(method=self.method, space=space, data_type=nmslib.DataType.OBJECT_AS_STRING)

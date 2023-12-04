@@ -6,6 +6,8 @@ import numpy as np
 import pandas as pd
 from scipy.sparse import issparse
 
+#warnings.filterwarnings('ignore', message='*Note that scikit-learn's randomized PCA might not be exactly reproducible*')
+warnings.filterwarnings("ignore")
 
 def materialize_as_ndarray(a):
     """Convert distributed arrays to ndarrays."""

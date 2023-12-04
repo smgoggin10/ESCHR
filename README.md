@@ -56,7 +56,7 @@ es.make_zarr(data=data, zarr_loc=zarr_loc)
 # (add any optional hyperparameter specifications,
 # but bear in mind the method was designed to work for
 # diverse datasets with the default settings.
-cc_obj = es.tl.ConsensusCluster(zarr_loc=zarr_loc)
+cc_obj = es.ConsensusCluster(zarr_loc=zarr_loc)
 
 # Now you can run the method with your prepped data:
 cc_obj.consensus_cluster()
@@ -75,14 +75,11 @@ cc_obj.make_adata(
 # To extract anndata object for downstream applications, run the following:
 adata = cc_obj.adata
 
-# Optionally add list of features (e.g. genes, proteins, etc. --
-# must match input feature names) to plot in either/both visualizations
-# Otherwise, output will include the top marker gene for each hard cluster.
 # Plot soft membership matrix heatmap visualization
-es.pl.make_smm_heatmap(cc_obj, features=None, output_path="/where/to/save/figure.png")
+es.pl.make_smm_heatmap(cc_obj, output_path="/where/to/save/figure.png")
 
 # Plot umap visualization
-es.pl.plot_umap(cc_obj, features=None, output_path="/where/to/save/figure.png")
+es.pl.plot_umap(cc_obj, output_path="/where/to/save/figure.png")
 ```
 
 ### Setting up to run via command line:
