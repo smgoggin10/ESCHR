@@ -2,7 +2,6 @@
 
 # ESCHR
 
-[![Tests][badge-tests]][link-tests]
 [![Documentation][badge-docs]][link-docs]
 
 [badge-tests]: https://img.shields.io/github/actions/workflow/status/smgoggin10/ESCHR/test.yaml?branch=main
