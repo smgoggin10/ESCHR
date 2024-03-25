@@ -2,7 +2,6 @@
 import math
 import multiprocessing
 import random
-import resource
 import time
 import traceback
 import warnings
@@ -28,7 +27,7 @@ from ._prune_features import calc_highly_variable_genes, calc_pca
 
 ## Suppress warnings from printing
 warnings.filterwarnings("ignore")
-#warnings.filterwarnings('ignore', message='*Note that scikit-learn's randomized PCA might not be exactly reproducible*')
+# warnings.filterwarnings('ignore', message='*Note that scikit-learn's randomized PCA might not be exactly reproducible*')
 
 
 ## FUNCTION AND CLASS DOCUMENTATION!!
@@ -266,23 +265,23 @@ def run_base_clustering(args_in):
         ## Subsample data
         n_orig = data.shape[0]  # save original number of data points
         data = data[subsample_ids, :]
-        
+
         # Get hyperparameters
         # scale k range for selecting number of neighbors
         # based on size of subsampled data
-        i = data.shape[0]
+        data.shape[0]
         iter_k_range = args_in[0][0]
         # set iter_k range floor based on asymptotic function of cell number, lower bound of 2
         ## k_floor = max(min(data.shape[0] * 0.01, iter_k_range[0]), 2)
-        #k_floor = max(2, ((15 * i) / (1 * (i) + 3000)))
+        # k_floor = max(2, ((15 * i) / (1 * (i) + 3000)))
         # set iter_k range ceiling based on dataset size
         ## k_ceil = min(data.shape[0] * 0.2, iter_k_range[1])
         ## k_ceil = min(data.shape[0] * 0.2, np.log10(data.shape[0])*25)
         ## k_ceil = min(np.log10(0.01*data.shape[0]) * 50, iter_k_range[1])
         # min ceiling is 5, otherwise based on asymptotic function of cell number
-        #k_ceil = max(5, (170 * i) / (1 * (i) + 3000))
-        #iter_k_range = (int(k_floor), int(k_ceil))
-        
+        # k_ceil = max(5, (170 * i) / (1 * (i) + 3000))
+        # iter_k_range = (int(k_floor), int(k_ceil))
+
         # Get hyperparameter settings for this ensemble member
         iter_k, la_res, metric = get_hyperparameters(iter_k_range, args_in[0][1], args_in[0][2])
         ## Log transform features if it is scRNAseq that has not yet been transformed
@@ -309,7 +308,7 @@ def run_base_clustering(args_in):
         per_iter_clust_assigns = np.zeros((n_orig), dtype=np.uint8)
         per_iter_clust_assigns[subsample_ids] = clusters + 1
 
-        n_clust = len(np.unique(clusters))
+        len(np.unique(clusters))
         a = np.zeros((n_orig), dtype=np.uint8)
         a[subsample_ids] = clusters[0] + 1
         b = np.ones((n_orig), dtype=np.uint8)
@@ -409,7 +408,7 @@ def consensus_cluster_leiden(in_args):
     ]  # just select clusters assigns for cells?
     hard_clusters, soft_membership_matrix = get_hard_soft_clusters(n, clustering, bipartite)  # , clust_occ_arr
     # return clust_occ_arr
-    
+
     ## Get ids of the base clusters that are participating in hard clusters (== good, keep)
     ## This trims "outlier" clusters that arose during the ensemble clustering
     # hard_only = list(set(range(soft_membership_matrix.shape[1])).intersection(set(np.unique(hard_clusters))))
@@ -625,7 +624,7 @@ class ConsensusCluster:
             cluster.
         """
         ## Run final consensus
-        start_time2 = time.time()
+        time.time()
 
         res_ls = [x / 1000 for x in range(50, 725, 25)]  # 0.05 to 0.7 inclusive by 0.025
 
@@ -679,8 +678,8 @@ class ConsensusCluster:
         # print("Final res: " + str(res_ls[np.argmax(acc_ls)]))
         print("Final res: " + str(res_ls[opt_res_idx]))
 
-        #time_per_iter = time.time() - start_time2
-        #print("time to run final consensus: " + str(time_per_iter))
+        # time_per_iter = time.time() - start_time2
+        # print("time to run final consensus: " + str(time_per_iter))
         return hard_clusters, soft_membership_matrix
 
     def consensus_cluster(self, out_dir=None):
