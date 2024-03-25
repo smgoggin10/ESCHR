@@ -93,7 +93,7 @@ def run_umap(cc_obj, return_layout=False, n_neighbors=15, metric="euclidean", **
     **X_umap** : `adata.obsm` field
         UMAP coordinates of data.
     """
-    
+
     if cc_obj.adata.X.shape[1] > 6000:
         bool_features = calc_highly_variable_genes(cc_obj.adata.X)
         X = cc_obj.adata.X[:, bool_features]
@@ -149,7 +149,9 @@ def plot_umap(
                 print(e)
                 print("No umap found - running umap...")
                 run_umap(cc_obj)
-                pd.DataFrame(cc_obj.adata.obsm['X_umap']).to_csv(os.path.join(("/").join(output_path.split("/")[0:-1]), "umap_layout.csv"), index=None)
+                pd.DataFrame(cc_obj.adata.obsm["X_umap"]).to_csv(
+                    os.path.join(("/").join(output_path.split("/")[0:-1]), "umap_layout.csv"), index=None
+                )
         else:
             print("No umap found - running umap...")
             run_umap(cc_obj)
@@ -174,7 +176,7 @@ def plot_umap(
     else:
         features_to_plot = ["hard_clusters", "cell_conf_score"]
     ("Done umap, generating figures...")
-    plt.rcParams['figure.figsize'] = [10, 8]
+    plt.rcParams["figure.figsize"] = [10, 8]
     if output_path is not None:
         try:
             # sc.plt.umap(adata, color=features_to_plot, s=50, frameon=False, ncols=3, palette='tab20', save=output_path)
@@ -200,6 +202,8 @@ def plot_umap(
         except Exception as e:
             print(e)
     else:
-        _umap_utils.embedding(cc_obj.adata, color=features_to_plot, frameon=False, ncols=2, palette=cat_palette, **kwargs)
+        _umap_utils.embedding(
+            cc_obj.adata, color=features_to_plot, frameon=False, ncols=2, palette=cat_palette, **kwargs
+        )
         # palette=cluster_color_dict, edgecolor='none', size = 15, vmax=200)
         plt.show()
